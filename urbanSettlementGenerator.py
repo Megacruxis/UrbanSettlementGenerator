@@ -6,10 +6,11 @@ import os
 import RNG
 import logging
 from SpacePartitioning import binarySpacePartitioning, quadtreeSpacePartitioning
-import GenerateHouse 
+import GenerateHouse
 import GenerateBuilding
+import GenerateGreenhouse
 from Earthworks import prepareLot
-import PathBuilding
+import GeneratePath
 
 # change to INFO if you want a verbose log!
 logging.basicConfig(filename="log", level=logging.WARNING, filemode='w')
@@ -31,12 +32,12 @@ def perform(level, box, options):
 	world_space = utilityFunctions.dotdict({"y_min": 0, "y_max": height-1, "x_min": 0, "x_max": width-1, "z_min": 0, "z_max": depth-1})
 	height_map = utilityFunctions.getHeightMap(level,box)
 
-	# ==== PARTITIONING OF NEIGHBOURHOODS ==== 
+	# ==== PARTITIONING OF NEIGHBOURHOODS ====
 	(center, neighbourhoods) = generateCenterAndNeighbourhood(world_space, height_map)
 	all_buildings = []
 
-	# ====  GENERATING CITY CENTER ==== 
-	minimum_h = 50 
+	# ====  GENERATING CITY CENTER ====
+	minimum_h = 50
 	minimum_w = 25
 	mininum_d = 25
 
@@ -48,6 +49,13 @@ def perform(level, box, options):
 	threshold = 1
 	partitioning_list = []
 	temp_partitioning_list = []
+
+	#City stats :
+	APARTMENT_SIZE = 2
+	HOUSE_SIZE = 4
+	GREENHOUSE_CAPACITY = 12
+	inhabitants = 0
+	greenhouse_count = 0
 
 	# run the partitioning algorithm for iterate times to get different partitionings of the same area
 	logging.info("Generating {} different partitionings for the the City Centre {}".format(iterate, center))
@@ -67,11 +75,11 @@ def perform(level, box, options):
 				(y_min, y_max, x_min, x_max, z_min, z_max) = (p[0], p[1], p[2],p[3], p[4], p[5])
 				failed_conditions = []
 				cond1 = utilityFunctions.hasValidGroundBlocks(x_min, x_max,z_min,z_max, height_map)
-				if cond1 == False: failed_conditions.append(1) 
+				if cond1 == False: failed_conditions.append(1)
 				cond2 = utilityFunctions.hasMinimumSize(y_min, y_max, x_min, x_max,z_min,z_max, minimum_h, minimum_w, mininum_d)
-				if cond2 == False: failed_conditions.append(2) 
+				if cond2 == False: failed_conditions.append(2)
 				cond3 = utilityFunctions.hasAcceptableSteepness(x_min, x_max,z_min,z_max, height_map, utilityFunctions.getScoreArea_type1, threshold)
-				if cond3 == False: failed_conditions.append(3) 
+				if cond3 == False: failed_conditions.append(3)
 				if cond1 and cond2 and cond3:
 					score = utilityFunctions.getScoreArea_type1(height_map, x_min, x_max, z_min, z_max)
 					valid_partitioning.append((score, p))
@@ -90,18 +98,19 @@ def perform(level, box, options):
 
 		threshold += 1
 		current_try += 1
-	
+
 	logging.info("Final lots ({}) for the City Centre {}: ".format(len(final_partitioning), center))
 	for p in final_partitioning:
 		logging.info("\t{}".format(p))
 
 	for partition in final_partitioning:
-		building = generateBuilding(world, partition, height_map)
+		building, apartments = generateBuilding(world, partition, height_map)
+		inhabitants += apartments * RNG.randint(1, APARTMENT_SIZE)
 		all_buildings.append(building)
 
-	# ==== GENERATING NEIGHBOURHOODS ==== 
-	
-	minimum_h = 10 
+	# ==== GENERATING NEIGHBOURHOODS ====
+
+	minimum_h = 10
 	minimum_w = 16
 	mininum_d = 16
 
@@ -113,13 +122,13 @@ def perform(level, box, options):
 	threshold = 1
 	partitioning_list = []
 	final_partitioning = []
-	
+
 	while available_lots < minimum_lots and current_try < maximum_tries:
 		partitioning_list = []
 		for i in range(iterate):
 			for neigh in neighbourhoods:
 				logging.info("Generating {} different partitionings for the neighbourhood {}".format(iterate, neigh))
-				
+
 				if RNG.random() < 0.5:
 					partitioning = binarySpacePartitioning(neigh[0], neigh[1], neigh[2], neigh[3], neigh[4], neigh[5], [])
 				else:
@@ -128,13 +137,13 @@ def perform(level, box, options):
 				valid_partitioning = []
 				for p in partitioning:
 					(y_min, y_max, x_min, x_max, z_min, z_max) = (p[0], p[1], p[2],p[3], p[4], p[5])
-					failed_conditions = [] 
+					failed_conditions = []
 					cond1 = utilityFunctions.hasValidGroundBlocks(x_min, x_max,z_min,z_max, height_map)
-					if cond1 == False: failed_conditions.append(1) 
+					if cond1 == False: failed_conditions.append(1)
 					cond2 = utilityFunctions.hasMinimumSize(y_min, y_max, x_min, x_max,z_min,z_max, minimum_h, minimum_w, mininum_d)
-					if cond2 == False: failed_conditions.append(2) 
+					if cond2 == False: failed_conditions.append(2)
 					cond3 = utilityFunctions.hasAcceptableSteepness(x_min, x_max,z_min,z_max, height_map, utilityFunctions.getScoreArea_type1, threshold)
-					if cond3 == False: failed_conditions.append(3) 
+					if cond3 == False: failed_conditions.append(3)
 					if cond1 and cond2 and cond3:
 						score = utilityFunctions.getScoreArea_type1(height_map, x_min, x_max, z_min, z_max)
 						valid_partitioning.append((score, p))
@@ -144,7 +153,7 @@ def perform(level, box, options):
 
 				partitioning_list.extend(valid_partitioning)
 				logging.info("Generated a partition with {} valid lots and {} invalids ones".format(len(valid_partitioning), len(partitioning)-len(valid_partitioning)))
-	
+
 		temp_partitioning_list.extend(partitioning_list)
 		# order partitions by steepness
 		temp_partitioning_list = sorted(temp_partitioning_list)
@@ -161,18 +170,24 @@ def perform(level, box, options):
 			logging.info("\t{}".format(p))
 
 	for partition in final_partitioning:
-		house = generateHouse(world, partition, height_map)
-		all_buildings.append(house)
+		if greenhouse_count * GREENHOUSE_CAPACITY < inhabitants :
+			greenhouse = generateGreenhouse(world, partition, height_map)
+			greenhouse_count += 1
+			all_buildings.append(greenhouse)
+		else :
+			house = generateHouse(world, partition, height_map)
+			inhabitants += RNG.randint(1, HOUSE_SIZE)
+			all_buildings.append(house)
 
-	# ==== GENERATE PATH MAP  ==== 
+	# ==== GENERATE PATH MAP  ====
  	# generate a path map that gives the cost of moving to each neighbouring cell
 	pathMap = utilityFunctions.getPathMap(height_map, width, depth)
 
-	# ==== CONNECTING BUILDINGS WITH ROADS  ==== 
+	# ==== CONNECTING BUILDINGS WITH ROADS  ====
 	logging.info("Calling MST on {} buildings".format(len(all_buildings)))
 	MST = utilityFunctions.getMST_Manhattan(all_buildings, pathMap, height_map)
-	
-	pavementBlockID = 4 
+
+	pavementBlockID = 4
 	pavementBlockSubtype = 0
 	for m in MST:
 		p1 = m[1]
@@ -182,12 +197,12 @@ def perform(level, box, options):
 	 	path = utilityFunctions.aStar(p1.entranceLot, p2.entranceLot, pathMap, height_map)
 	 	if path != None:
 	 		logging.info("Found path between {} and {}. Generating road...".format(p1.entranceLot, p2.entranceLot))
-		 	PathBuilding.pavementConnection(world, path, height_map, (pavementBlockID, pavementBlockSubtype))
+		 	GeneratePath.generatPath(world, path, height_map, (pavementBlockID, pavementBlockSubtype))
 		else:
 			logging.info("Couldnt find path between {} and {}. Generating a straight road between them...".format(p1.entranceLot, p2.entranceLot))
-	 		PathBuilding.pavementConnection_StraightLine(world, p1.entranceLot[1], p1.entranceLot[2], p2.entranceLot[1], p2.entranceLot[2], height_map, (pavementBlockID, pavementBlockSubtype))
+	 		GeneratePath.generatPath_StraightLine(world, p1.entranceLot[1], p1.entranceLot[2], p2.entranceLot[1], p2.entranceLot[2], height_map, (pavementBlockID, pavementBlockSubtype))
 
-	# ==== UPDATE WORLD ==== 
+	# ==== UPDATE WORLD ====
 	world.updateWorld()
 
 def generateCenterAndNeighbourhood(space, height_map):
@@ -208,6 +223,12 @@ def generateBuilding(matrix, p, height_map):
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-2, p[4]+1, p[5]-2, -1)
 	return building
 
+def generateGreenhouse(matrix, p, height_map):
+	h = prepareLot(matrix, p, height_map)
+	greenhouse = GenerateGreenhouse.generateGreenhouse(matrix, h, p[1], p[2], p[3], p[4], p[5])
+	utilityFunctions.updateHeightMap(height_map, p[2]+3, p[3]-3, p[4]+2, p[5]-2, -1)
+	return greenhouse
+
 def generateHouse(matrix, p, height_map):
 	logging.info("Generating a house in lot {}".format(p))
 	logging.info("Terrain before flattening: ")
@@ -216,7 +237,7 @@ def generateHouse(matrix, p, height_map):
 		for z in range(p[4], p[5]):
 			line += str(height_map[x][z])+" "
 		logging.info(line)
-				
+
 	h = prepareLot(matrix, p, height_map)
 
 	logging.info("Terrain after flattening: ")
@@ -227,7 +248,7 @@ def generateHouse(matrix, p, height_map):
 		logging.info(line)
 
 	house = GenerateHouse.generateHouse(matrix, h, p[1],p[2],p[3], p[4], p[5])
-	
+
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-1, p[4]+1, p[5]-1, -1)
 
 	logging.info("Terrain after construction: ")
