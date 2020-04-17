@@ -11,7 +11,7 @@ import RNG
 from copy import deepcopy
 import sys
 
-air_like = [0, 6, 17, 18, 30, 31, 32, 37, 38, 39, 40, 59, 81, 83, 85, 104, 105, 106, 107, 111, 141, 142, 161, 162, 175, 78, 79, 99]
+air_like = [0, 6, 17, 18, 30, 31, 32, 37, 38, 39, 40, 59, 81, 83, 85, 104, 105, 106, 107, 111, 141, 142, 161, 162, 175, 78, 79, 99, 100]
 ground_like = [1, 2, 3]
 water_like = [8, 9, 10, 11]
 
@@ -64,7 +64,7 @@ def findTerrain_old(level, x, z, miny, maxy):
 			return y-1
 		# print level.blockAt(x,y,z)
 	return -1
-	
+
 
 
 # returns a 2d matrix representing tree trunk locations on an x-z coordinate basis (bird's eye view) in the given box
@@ -102,7 +102,7 @@ def getBoxSize(box):
 	return (box.maxx - box.minx, box.maxy - box.miny, box.maxz - box.minz)
 
 # returns an array of blocks after raytracing from (x1,y1,z1) to (x2,y2,z2)
-# this uses Bresenham 3d algorithm, taken from a modified version written by Bob Pendleton  
+# this uses Bresenham 3d algorithm, taken from a modified version written by Bob Pendleton
 def raytrace((x1, y1, z1), (x2, y2, z2)):
 	output = []
 
@@ -139,7 +139,7 @@ def raytrace((x1, y1, z1), (x2, y2, z2)):
 	dx2 = l << 1
 	dy2 = m << 1
 	dz2 = n << 1
-    
+
 	if l >= m and l >= n:
 		err_1 = dy2 - l
 		err_2 = dz2 - l
@@ -157,7 +157,7 @@ def raytrace((x1, y1, z1), (x2, y2, z2)):
 			err_1 += dy2
 			err_2 += dz2
 			point[0] += x_inc
-        
+
 	elif m >= l and m >= n:
 		err_1 = dx2 - m
 		err_2 = dz2 - m
@@ -175,8 +175,8 @@ def raytrace((x1, y1, z1), (x2, y2, z2)):
 			err_1 += dx2
 			err_2 += dz2
 			point[1] += y_inc
-        
-	else: 
+
+	else:
 		err_1 = dy2 - n
 		err_2 = dx2 - n
 		for i in range(n):
@@ -207,10 +207,23 @@ def drillDown(level,box):
 		# print level.blockAt(x,y,z)
 	return blocks
 
+# Given an x an z coordinate, this will go from box.miny to maxy and return the first block under a block considered as an air block
+def findTerrain2(level, x, z, miny, maxy, air_like_id):
+	blocks = []
+	if air_like_id is None :
+		air_like_id = air_like
+
+	for y in xrange(maxy-1, miny-1, -1):
+		if level.blockAt(x, y, z) in air_like_id:
+			continue
+		elif level.blockAt(x, y, z) in water_like:
+			return -1
+		else:
+			return y
+	return -1
+
 # Given an x an z coordinate, this will go from box.miny to maxy and return the first block under an air block
 def findTerrain(level, x, z, miny, maxy):
-	
-
 	blocks = []
 	for y in xrange(maxy-1, miny-1, -1):
 		#print("y: ", y, " block: ", level.blockAt(x, y, z))
@@ -237,9 +250,9 @@ class dotdict(dict):
             raise AttributeError
         return self.get(attr, None)
 
-# generate and return 3d matrix as in the format matrix[h][w][d] 
+# generate and return 3d matrix as in the format matrix[h][w][d]
 def generateMatrix(level, box, width, depth, height):
-	matrix = Matrix(level, box, height, width, depth)			
+	matrix = Matrix(level, box, height, width, depth)
 	return matrix
 
 # get a subsection of a give arean partition based on the percentage
@@ -275,7 +288,7 @@ def subtractPartition(outer, inner):
 	return (p1,p2,p3,p4)
 
 def getEuclidianDistancePartitions(p1, p2):
-	
+
 	p1_center = (p1[0] + int((p1[1]-p1[0])*0.5), p1[2] + int((p1[3]-p1[2])*0.5))
 	p2_center = (p2[0] + int((p2[1]-p2[0])*0.5), p2[2] + int((p2[3]-p2[2])*0.5))
 	euclidian_distance = getEuclidianDistance(p1_center,p2_center)
@@ -293,7 +306,7 @@ def getManhattanDistance(p1,p2):
 # Given a partition and height map, return true if there's no water
 # or other unwalkable block inside that partition
 def hasValidGroundBlocks(x_min, x_max,z_min,z_max, height_map):
-	
+
 	for x in range(x_min, x_max):
 		for z in range(z_min, z_max):
 			if height_map[x][z] == -1:
@@ -318,13 +331,13 @@ def hasAcceptableSteepness(x_min, x_max,z_min,z_max, height_map, scoring_functio
 
 # given a box selection, returns a 2d matrix where each element is
 # the height of the first non-block air in that x, z position
-def getHeightMap(level, box):
+def getHeightMap(level, box, air_like_id) :
 	logging.info("Calculating height map...")
 	terrain = [[0 for z in range(box.minz,box.maxz)] for x in range(box.minx,box.maxx)]
-	
+
 	for d, z in zip(range(box.minz,box.maxz), range(0, box.maxz-box.minz)):
 		for w, x in zip(range(box.minx,box.maxx), range(0, box.maxx-box.minx)):
-			terrain[x][z] = findTerrain(level, w, d, box.miny, box.maxy)
+			terrain[x][z] = findTerrain2(level, w, d, box.miny, box.maxy, air_like_id)
 
 	#print("Terrain Map: ")
 	#for x in range(0, box.maxx-box.minx):
@@ -361,22 +374,22 @@ def getPathMap(height_map, width, depth):
 				if pathMap[x][z].right > threshold or height_map[x+1][z] == -1:
 					pathMap[x][z].right = -1
 
-			#down 
+			#down
 			if z-1 < 0:
 				pathMap[x][z].down = -1
 			else:
 				pathMap[x][z].down = abs(height_map[x][z] - height_map[x][z-1])
 				if pathMap[x][z].down > threshold or height_map[x][z-1] == -1:
-					pathMap[x][z].down = -1			
+					pathMap[x][z].down = -1
 
-			#up 
+			#up
 			if z+1 >= depth:
 				pathMap[x][z].up = -1
 			else:
 				pathMap[x][z].up = abs(height_map[x][z+1] - height_map[x][z])
 				if pathMap[x][z].up > threshold or height_map[x][z+1] == -1:
 					pathMap[x][z].up = -1
-			
+
 	return pathMap
 
 
@@ -457,7 +470,7 @@ def removeOverlaping(areas):
 		current_area = areas[0]
 		for index, a in enumerate(validAreas):
 			if intersectRect(current_area, a):
-				break 
+				break
 		else:
 			validAreas.append(current_area)
 		areas = areas[1:]
@@ -483,7 +496,7 @@ def getNonIntersectingPartitions(partitioning):
 				intersect = True
 				break
 		if intersect == False:
-			cleaned_partitioning.append(partition) 
+			cleaned_partitioning.append(partition)
 	return cleaned_partitioning
 
 # update the minecraft world given a matrix with h,w,d dimensions, and each element in the
@@ -518,15 +531,15 @@ def getMST_Manhattan(buildings, pathMap, height_map):
 	partitions.remove(selected_vertex)
 
 	while len(partitions) > 0:
-	
+
 		edges = []
 		for v in vertices:
 			logging.info("v: {}".format(v))
 			for p in partitions:
-				logging.info("\tp: {}".format(p))				
+				logging.info("\tp: {}".format(p))
 				p1 = v.entranceLot
 				p2 = p.entranceLot
-				distance = getManhattanDistance((p1[1],p1[2]), (p2[1],p2[2]))	
+				distance = getManhattanDistance((p1[1],p1[2]), (p2[1],p2[2]))
 				edges.append((distance, v, p))
 
 		edges = sorted(edges)
@@ -535,7 +548,7 @@ def getMST_Manhattan(buildings, pathMap, height_map):
 		partitions.remove(edges[0][2])
 		vertices.append(edges[0][2])
 	return MST
-	
+
 
 #print a matrix given its h,w,d dimensions
 def printMatrix(matrix, height, width, depth):

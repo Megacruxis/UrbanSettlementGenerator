@@ -11,6 +11,7 @@ import GenerateBuilding
 import GenerateGreenhouse
 from Earthworks import prepareLot
 import GeneratePath
+import EnvironmentAnalyzer
 
 # change to INFO if you want a verbose log!
 logging.basicConfig(filename="log", level=logging.WARNING, filemode='w')
@@ -30,7 +31,19 @@ def perform(level, box, options):
 	logging.info("Selection box dimensions {}, {}, {}".format(width,height,depth))
 	world = utilityFunctions.generateMatrix(level, box, width,depth,height)
 	world_space = utilityFunctions.dotdict({"y_min": 0, "y_max": height-1, "x_min": 0, "x_max": width-1, "z_min": 0, "z_max": depth-1})
-	height_map = utilityFunctions.getHeightMap(level,box)
+	height_map = utilityFunctions.getHeightMap(level,box, None)
+
+	# === Wood quantity === #
+	air_like = [0, 6, 30, 31, 32, 37, 38, 39, 40, 59, 81, 83, 85, 100, 104, 105, 106, 107, 111, 141, 142, 175, 78, 79, 99]
+	wood_height_map = utilityFunctions.getHeightMap(level, box, air_like)
+	usable_wood = EnvironmentAnalyzer.determinate_usable_wood(level, wood_height_map, box.minx, box.maxx, box.minz, box.maxz)
+
+	# ===  City stats === #
+	APARTMENT_SIZE = 2
+	HOUSE_SIZE = 4
+	GREENHOUSE_CAPACITY = 12
+	inhabitants = 0
+	greenhouse_count = 0
 
 	# ==== PARTITIONING OF NEIGHBOURHOODS ====
 	(center, neighbourhoods) = generateCenterAndNeighbourhood(world_space, height_map)
@@ -49,13 +62,6 @@ def perform(level, box, options):
 	threshold = 1
 	partitioning_list = []
 	temp_partitioning_list = []
-
-	#City stats :
-	APARTMENT_SIZE = 2
-	HOUSE_SIZE = 4
-	GREENHOUSE_CAPACITY = 12
-	inhabitants = 0
-	greenhouse_count = 0
 
 	# run the partitioning algorithm for iterate times to get different partitionings of the same area
 	logging.info("Generating {} different partitionings for the the City Centre {}".format(iterate, center))
@@ -171,7 +177,7 @@ def perform(level, box, options):
 
 	for partition in final_partitioning:
 		if greenhouse_count * GREENHOUSE_CAPACITY < inhabitants :
-			greenhouse = generateGreenhouse(world, partition, height_map)
+			greenhouse = generateGreenhouse(world, partition, height_map, usable_wood)
 			greenhouse_count += 1
 			all_buildings.append(greenhouse)
 		else :
@@ -223,9 +229,9 @@ def generateBuilding(matrix, p, height_map):
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-2, p[4]+1, p[5]-2, -1)
 	return building
 
-def generateGreenhouse(matrix, p, height_map):
+def generateGreenhouse(matrix, p, height_map, usable_wood):
 	h = prepareLot(matrix, p, height_map)
-	greenhouse = GenerateGreenhouse.generateGreenhouse(matrix, h, p[1], p[2], p[3], p[4], p[5])
+	greenhouse = GenerateGreenhouse.generateGreenhouse(matrix, h, p[1], p[2], p[3], p[4], p[5], usable_wood)
 	utilityFunctions.updateHeightMap(height_map, p[2]+3, p[3]-3, p[4]+2, p[5]-2, -1)
 	return greenhouse
 

@@ -15,7 +15,7 @@ WHITE_GLASS_ID = (95, 0)
 GLASS_ID = (20, 0)
 WATER_ID = (9, 0)
 SEA_LANTERN_ID = (169, 0)
-PLANKS_ID = (5, 0)
+PLANKS_ID = {'oak': (5, 0), 'spruce': (5, 1), 'birch': (5,2), 'jungle': (5,3), 'acacia': (5,4), 'dark_oak': (5,5)}
 TRAPDOOR_ID = (96, 0)
 GRASS_PATH_ID = (208, 0)
 FARMLAND_ID = (60, 0)
@@ -25,7 +25,7 @@ POTATO_ID = (142, 0)
 plants = [WHEAT_ID, CARROT_ID, POTATO_ID]
 
 
-def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max):
+def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wood):
     greenhouse = utilityFunctions.dotdict()
     greenhouse.type = "greenhouse"
     greenhouse.lotArea = utilityFunctions.dotdict({"y_min": h_min, "y_max": h_max, "x_min": x_min, "x_max": x_max, "z_min": z_min, "z_max": z_max})
@@ -42,7 +42,7 @@ def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max):
     logging.info("Construction area {}".format(greenhouse.constructionArea))
 
     """Todo, Improve adaptability"""
-    foundation = PLANKS_ID
+    foundation = PLANKS_ID[usable_wood[RNG.randint(0, len(usable_wood) - 1)]]
     ground = GRASS_PATH_ID
     used_glass = WHITE_GLASS_ID
 
@@ -101,7 +101,6 @@ def generateGroundAndCropse(matrix, h_min, x_min, x_max, z_min, z_max, foundatio
                     matrix.setValue(h_min, x, z, ground)
             elif x == x_min + 1 or x == x_max - 1 :
                 if z == z_min + 3 or z == z_max - 3 :
-                    """Todo, Improve adaptability"""
                     matrix.setValue(h_min, x, z, WATER_ID)
                     #Put a dirt bloc under the water source and a trapdoor above
                     matrix.setValue(h_min - 1, x, z, DIRT_ID)
