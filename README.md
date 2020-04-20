@@ -8,9 +8,9 @@ More information available at the [official website](http://gendesignmc.engineer
 
 Move the whole repository folder into the MCEdit's filters folder, select a section of the map and call the SettlementGenerator file.
 
-How can we improve the generator :
+# How can we improve the generator :
 
-- The "wood" adaptability can be improved. I would be interesting if all the buildings which have wood where using the result of my function. Also, the wood selected to build is currently random (between the existing one). It would be better if the random was in proportion of the quantity of each type of wood (like if I have 500 oak and 100 dark oak it would be 1/6 for dark oak and 5/6 for oak). And to finish, the generator need a behavior if he can't find any tree in the area.
+- The "wood" adaptability can be improved. I would be interesting if all the buildings which have wood were using the result of my function. Also, the wood selected to build is currently random (between the existing one). It would be better if the random was in proportion of the quantity of each type of wood (like if I have 500 oak and 100 dark oak it would be 1/6 for dark oak and 5/6 for oak). And to finish, the generator need a behavior if he can't find any tree in the area.
 
 - The city is always generated the same way without any consideration for the biome. It could be interesting if the biome influences the blocks used to build the building
 (the houses would be made of sandstone in the desert, the greenhouse would use yellow glass to represent the sand,...).
