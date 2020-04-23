@@ -31,12 +31,12 @@ def perform(level, box, options):
 	logging.info("Selection box dimensions {}, {}, {}".format(width,height,depth))
 	world = utilityFunctions.generateMatrix(level, box, width,depth,height)
 	world_space = utilityFunctions.dotdict({"y_min": 0, "y_max": height-1, "x_min": 0, "x_max": width-1, "z_min": 0, "z_max": depth-1})
-	height_map = utilityFunctions.getHeightMap(level,box, None)
+	height_map = utilityFunctions.getHeightMap(level,box, None, False)
 
-	# === Wood quantity === #
-	air_like = [0, 6, 30, 31, 32, 37, 38, 39, 40, 59, 81, 83, 85, 100, 104, 105, 106, 107, 111, 141, 142, 175, 78, 79, 99]
-	wood_height_map = utilityFunctions.getHeightMap(level, box, air_like)
-	usable_wood = EnvironmentAnalyzer.determinate_usable_wood(level, wood_height_map, box.minx, box.maxx, box.minz, box.maxz)
+	# === Wood quantity and Biome analyzer === #
+	air_like = [0, 5, 6, 30, 37, 38, 39, 40, 59, 83, 85, 104, 105, 107, 141, 142, 175]
+	wood_height_map = utilityFunctions.getHeightMap(level, box, air_like, True)
+	(usable_wood, biome) = EnvironmentAnalyzer.determinate_usable_wood(level, wood_height_map, box.minx, box.maxx, box.minz, box.maxz)
 
 	# ===  City stats === #
 	APARTMENT_SIZE = 2
@@ -223,7 +223,6 @@ def generateCenterAndNeighbourhood(space, height_map):
 	return (center, neighbourhoods)
 
 def generateBuilding(matrix, p, height_map):
-
 	h = prepareLot(matrix, p, height_map)
 	building = GenerateBuilding.generateBuilding(matrix, h, p[1],p[2],p[3], p[4], p[5])
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-2, p[4]+1, p[5]-2, -1)

@@ -11,7 +11,7 @@ import RNG
 from copy import deepcopy
 import sys
 
-air_like = [0, 6, 17, 18, 30, 31, 32, 37, 38, 39, 40, 59, 81, 83, 85, 104, 105, 106, 107, 111, 141, 142, 161, 162, 175, 78, 79, 99, 100]
+air_like = [0, 5, 6, 17, 18, 30, 31, 32, 37, 38, 39, 40, 59, 81, 83, 85, 104, 105, 106, 107, 111, 141, 142, 161, 162, 175, 78, 79, 99, 100]
 ground_like = [1, 2, 3]
 water_like = [8, 9, 10, 11]
 
@@ -222,6 +222,19 @@ def findTerrain2(level, x, z, miny, maxy, air_like_id):
 			return y
 	return -1
 
+# Given an x an z coordinate, this will go from box.miny to maxy and return the first block under a block considered as an air block
+def findTerrain3(level, x, z, miny, maxy, air_like_id):
+	blocks = []
+	if air_like_id is None :
+		air_like_id = air_like
+
+	for y in xrange(maxy-1, miny-1, -1):
+		if level.blockAt(x, y, z) in air_like_id:
+			continue
+		else:
+			return y
+	return -1
+
 # Given an x an z coordinate, this will go from box.miny to maxy and return the first block under an air block
 def findTerrain(level, x, z, miny, maxy):
 	blocks = []
@@ -331,13 +344,16 @@ def hasAcceptableSteepness(x_min, x_max,z_min,z_max, height_map, scoring_functio
 
 # given a box selection, returns a 2d matrix where each element is
 # the height of the first non-block air in that x, z position
-def getHeightMap(level, box, air_like_id) :
+def getHeightMap(level, box, air_like_id, consider_water) :
 	logging.info("Calculating height map...")
 	terrain = [[0 for z in range(box.minz,box.maxz)] for x in range(box.minx,box.maxx)]
 
 	for d, z in zip(range(box.minz,box.maxz), range(0, box.maxz-box.minz)):
 		for w, x in zip(range(box.minx,box.maxx), range(0, box.maxx-box.minx)):
-			terrain[x][z] = findTerrain2(level, w, d, box.miny, box.maxy, air_like_id)
+			if consider_water :
+				terrain[x][z] = findTerrain3(level, w, d, box.miny, box.maxy, air_like_id)
+			else:
+				terrain[x][z] = findTerrain2(level, w, d, box.miny, box.maxy, air_like_id)
 
 	#print("Terrain Map: ")
 	#for x in range(0, box.maxx-box.minx):
@@ -518,8 +534,6 @@ def getCentralPoint(x_min, x_max, z_min, z_max):
 	z_mid = z_max - int((z_max - z_min)/2)
 	return (x_mid, z_mid)
 
-
-
 def getMST_Manhattan(buildings, pathMap, height_map):
 	MST = []
 	vertices = []
@@ -570,6 +584,16 @@ def cleanProperty(matrix, h_min, h_max, x_min, x_max, z_min, z_max):
 		for x in range(x_min, x_max+1):
 			for z in range(z_min, z_max+1):
 				matrix.setValue(h,x,z, (0,0))
+
+def selectRandomWood(usable_wood) :
+	selected = RNG.randint(0, 100)
+	current = 0
+	for key in usable_wood.keys():
+		 current += usable_wood[key]
+		 if current >= selected :
+			 return key
+	logging.info("Error in select random Wood no result obtained !")
+	return None
 
 # algorithm to randomly find flat areas given a height map
 def getAreasSameHeight(box,terrain):
