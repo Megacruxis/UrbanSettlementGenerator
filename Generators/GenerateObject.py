@@ -5,11 +5,27 @@ def generateCentralTable(world, y, x, z):
 	world.setValue(y+1, x-1, z, (53, 1))
 	world.setValue(y+1, x+1, z, (53, 0))
 
+def generateCentralTableSouth(world, y, x, z):
+	world.setValue(y+1, x, z, (85,0))
+	world.setValue(y+2, x, z, (72,0))
+	world.setValue(y+1, x, z-1, (53, 3))
+	world.setValue(y+1, x, z+1, (53, 2))
+
 def generateBookshelf(world, y, x, z):
 	world.setValue(y+1, x-1, z-1, (47,0))
 	world.setValue(y+1, x-2, z-1, (47,0))
 	world.setValue(y+2, x-1, z-1, (47,0))
 	world.setValue(y+2, x-2, z-1, (47,0))
+	world.setValue(y+3, x-1, z-1, (126,0))
+	world.setValue(y+3, x-2, z-1, (126,0))
+
+def generateBookshelfEast(world, y, x, z):
+	world.setValue(y+1, x-1, z-1, (47,0))
+	world.setValue(y+1, x-1, z-2, (47,0))
+	world.setValue(y+2, x-1, z-1, (47,0))
+	world.setValue(y+2, x-1, z-2, (47,0))
+	world.setValue(y+3, x-1, z-1, (126,0))
+	world.setValue(y+3, x-1, z-2, (126,0))
 
 def generateCouch(world, y, x, z):
 	world.setValue(y+1, x+3, z-1, (53, 0))
@@ -25,3 +41,7 @@ def generateChandelier(world, y, x, z, size=1):
 def generateBed(world, y, x, z):
 	world.setEntity(y+1, x-1, z+1, (26,11), "bed")
 	world.setEntity(y+1, x-2, z+1, (26,3), "bed")
+
+def generateBedSouth(world, y, x, z):
+	world.setEntity(y+1, x, z+1, (26,2), "bed")
+	world.setEntity(y+1, x, z, (26,10), "bed")
