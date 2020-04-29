@@ -11,7 +11,6 @@ PLANT_ID = [31, 32, 81, 78, 99, 100, 106, 111, 127]
 NO_SUB_ID = [99, 100, 106] #block with useless sub_id info
 FLUID_ID = [9]
 AIR_ID = [0, 18, 161, 6, 37, 38, 39, 40, 83, 175]
-WOOD_NAME = {'17:0': 'oak', '17:1': 'spruce', '17:2': 'birch', '17:3': 'jungle', '162:0': 'acacia', '162:1': 'dark_oak'}
 
 found_wood = {'17:0': 0, '17:1': 0, '17:2': 0, '17:3': 0, '162:0': 0, '162:1': 0}
 found_blocks = {}
