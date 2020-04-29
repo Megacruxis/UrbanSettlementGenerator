@@ -9,6 +9,7 @@ from SpacePartitioning import binarySpacePartitioning, quadtreeSpacePartitioning
 import GenerateHouse
 import GenerateBuilding
 import GenerateGreenhouse
+import BlocksInfo as BlocksInfo
 from Earthworks import prepareLot
 import GeneratePath
 import EnvironmentAnalyzer
@@ -110,7 +111,7 @@ def perform(level, box, options):
 		logging.info("\t{}".format(p))
 
 	for partition in final_partitioning:
-		building, apartments = generateBuilding(world, partition, height_map)
+		building, apartments = generateBuilding(world, partition, height_map, usable_wood, biome)
 		inhabitants += apartments * RNG.randint(1, APARTMENT_SIZE)
 		all_buildings.append(building)
 
@@ -181,7 +182,7 @@ def perform(level, box, options):
 			greenhouse_count += 1
 			all_buildings.append(greenhouse)
 		else :
-			house = generateHouse(world, partition, height_map)
+			house = generateHouse(world, partition, height_map, usable_wood)
 			inhabitants += RNG.randint(1, HOUSE_SIZE)
 			all_buildings.append(house)
 
@@ -222,9 +223,9 @@ def generateCenterAndNeighbourhood(space, height_map):
 		logging.info("Generated neighbourhood: {}".format(p))
 	return (center, neighbourhoods)
 
-def generateBuilding(matrix, p, height_map):
+def generateBuilding(matrix, p, height_map, usable_wood, biome):
 	h = prepareLot(matrix, p, height_map)
-	building = GenerateBuilding.generateBuilding(matrix, h, p[1],p[2],p[3], p[4], p[5])
+	building = GenerateBuilding.generateBuilding(matrix, h, p[1],p[2],p[3], p[4], p[5], usable_wood, biome)
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-2, p[4]+1, p[5]-2, -1)
 	return building
 
@@ -234,7 +235,7 @@ def generateGreenhouse(matrix, p, height_map, usable_wood):
 	utilityFunctions.updateHeightMap(height_map, p[2]+3, p[3]-3, p[4]+2, p[5]-2, -1)
 	return greenhouse
 
-def generateHouse(matrix, p, height_map):
+def generateHouse(matrix, p, height_map, usable_wood):
 	logging.info("Generating a house in lot {}".format(p))
 	logging.info("Terrain before flattening: ")
 	for x in range (p[2], p[3]):
@@ -251,8 +252,8 @@ def generateHouse(matrix, p, height_map):
 		for z in range(p[4], p[5]):
 			line += str(height_map[x][z])+" "
 		logging.info(line)
-
-	house = GenerateHouse.generateHouse(matrix, h, p[1],p[2],p[3], p[4], p[5])
+	ceiling = BlocksInfo.PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
+	house = GenerateHouse.generateHouse(matrix, h, p[1],p[2],p[3], p[4], p[5], ceiling)
 
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-1, p[4]+1, p[5]-1, -1)
 

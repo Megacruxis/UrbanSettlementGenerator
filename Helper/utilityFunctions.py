@@ -8,6 +8,7 @@ from collections import defaultdict
 from AStar import aStar
 from Matrix import Matrix
 import RNG
+import BlocksInfo as BlocksInfo
 from copy import deepcopy
 import sys
 
@@ -591,7 +592,7 @@ def selectRandomWood(usable_wood) :
 	for key in usable_wood.keys():
 		 current += usable_wood[key]
 		 if current >= selected :
-			 return key
+			 return BlocksInfo.WOOD_NAME[key]
 	logging.info("Error in select random Wood no result obtained !")
 	return None
 

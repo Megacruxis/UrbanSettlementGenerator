@@ -4,7 +4,7 @@ import RNG
 import logging
 from pymclevel import alphaMaterials, BoundingBox
 import utilityFunctions as utilityFunctions
-import EnvironmentAnalyzer as EnvironmentAnalyzer
+import BlocksInfo as BlocksInfo
 from GenerateCarpet import generateCarpet
 from GenerateObject import *
 
@@ -43,7 +43,7 @@ def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_
     logging.info("Construction area {}".format(greenhouse.constructionArea))
 
     """Todo, Improve adaptability"""
-    foundation = PLANKS_ID[EnvironmentAnalyzer.WOOD_NAME[utilityFunctions.selectRandomWood(usable_wood)]]
+    foundation = PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
     ground = GRASS_PATH_ID
     used_glass = WHITE_GLASS_ID
 

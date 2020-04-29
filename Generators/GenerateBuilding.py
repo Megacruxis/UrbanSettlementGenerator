@@ -4,10 +4,12 @@ import RNG
 import logging
 from pymclevel import alphaMaterials, BoundingBox
 import utilityFunctions as utilityFunctions
+import BlocksInfo as BlocksInfo
 from GenerateObject import *
 from GenerateCarpet import generateCarpet
+from GenerateBalcony import generateBalcony
 
-def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max):
+def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wood, biome):
 
 	building = utilityFunctions.dotdict()
 	building.type = "building"
@@ -25,6 +27,7 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max):
 	wall = (159, random.randint(0,15))
 	ceiling = wall
 	floor = wall
+	(slab, stairs, fence, structureBloc) = selectBuildingBlocks(usable_wood, biome)
 
 	floor_size = 8
 	max_height = h_max-h_min
@@ -59,6 +62,7 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max):
 
 		generateStairs(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall)
 		generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max-6, double_apartment_floor)
+		generateBalconySouth(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, building.area.z_min, building.orientation, double_apartment_floor, wall, slab, stairs, fence, structureBloc)
 
 	return (building, h_max / floor_size)
 
@@ -76,6 +80,13 @@ def getBuildingAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max):
 		z_max = z_mid + building_size_z/2
 
 	return (h_min, h_max, x_min, x_max, z_min, z_max)
+
+def selectBuildingBlocks(usable_wood, biome) :
+	if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() :
+		return BlocksInfo.UPPER_SLAB_ID[biome], BlocksInfo.STAIRS_ID[biome], BlocksInfo.FENCE_ID['iron_bar'], BlocksInfo.STRUCTURE_BLOCK_ID[biome]
+	else :
+		picked_wood = utilityFunctions.selectRandomWood(usable_wood)
+		return BlocksInfo.UPPER_SLAB_ID[picked_wood], BlocksInfo.STAIRS_ID[picked_wood], BlocksInfo.FENCE_ID[picked_wood], BlocksInfo.PLANKS_ID[picked_wood]
 
 def pickDoubleapartmentFloor(h_min, h_max, floor_size):
 	floor_number = (h_max - h_min) / floor_size
@@ -169,7 +180,6 @@ def generateFloorPlan(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_m
 		cur_floor += floor_size
 
 def generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, double_apartment_floor):
-	#z_max = z_max -6
 	cur_floor = h_min
 	floor = 0
 	x_mid = x_max - int((x_max - x_min)/2)
@@ -177,7 +187,10 @@ def generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_
 
 	while cur_floor < h_max:
 		cur_floor_ceiling = cur_floor+floor_size
-		if cur_floor in double_apartment_floor :
+		if cur_floor == h_min :
+			#the first floor is different
+			a = True
+		elif cur_floor in double_apartment_floor :
 			#first apartment
 			generateCarpet(matrix.matrix, cur_floor+1, x_min+1, x_mid, z_min+1, z_max)
 			generateChandelier(matrix, cur_floor_ceiling, x_mid-4, z_mid, 2)
@@ -205,6 +218,41 @@ def generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_
 			generateChandelier(matrix, cur_floor_ceiling, x_mid+5, z_mid, 2)
 
 		cur_floor += floor_size
+
+def generateBalconySouth(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, area_z_min, orientation, double_apartment_floor, wall, slab_id, stairs_id, fence_id, structureBloc_id):
+	cur_floor = h_min + floor_size
+	while cur_floor < h_max:
+		x_mid = x_max - (x_max - x_min) / 2
+		if cur_floor in double_apartment_floor :
+			x_max_quarter = (x_mid - x_min) / 2
+			if random.randint(0, 100) < 50 :
+				quarter = x_mid - x_max_quarter
+				generateLamp(matrix, cur_floor + 3, quarter, z_min, orientation)
+				generateDoor(matrix, cur_floor+1, quarter, z_min, (64,8), (64,3))
+				generateBalcony(matrix, cur_floor,quarter - 2, quarter + 2, z_min - 1, area_z_min, orientation, stairs_id[0], fence_id, structureBloc_id, slab_id, wall)
+			if random.randint(0, 100) < 50 :
+				x_max_quarter += 1 if x_max_quarter < 4 else 0
+				quarter = x_mid + x_max_quarter
+				generateLamp(matrix, cur_floor + 3, quarter, z_min, orientation)
+				generateDoor(matrix, cur_floor+1, quarter, z_min, (64,8), (64,3))
+				generateBalcony(matrix, cur_floor, quarter - 2, quarter + 2, z_min - 1, area_z_min, orientation, stairs_id[0], fence_id, structureBloc_id, slab_id, wall)
+		else :
+			if random.randint(0,100) < 75 :
+				generateLamp(matrix, cur_floor + 3, x_mid, z_min, orientation)
+				generateDoor(matrix, cur_floor + 1, x_mid, z_min, (64,8), (64,3))
+				generateBalcony(matrix, cur_floor, x_min + 2, x_max - 2, z_min - 1, area_z_min, orientation, stairs_id[0], fence_id, structureBloc_id, slab_id, wall)
+		cur_floor += floor_size
+
+def generateLamp(matrix, h, x, z, orientation):
+	matrix.setValue(h, x, z, (123, 0))
+	if orientation == "N" :
+		matrix.setValue(h, x, z - 1, (69, 4))
+	elif orientation == "S" :
+		matrix.setValue(h, x, z + 1, (69, 3))
+	elif orientation == "W" :
+		matrix.setValue(h, x + 1, z, (69, 2))
+	elif orientation == "E" :
+		matrix.setValue(h, x - 1, z, (69, 1))
 
 def generateCorridorInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max):
 	cur_floor = h_min

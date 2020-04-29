@@ -16,9 +16,9 @@ Friday : I begin my work on the improvement of the building. Spend most of my da
 
 Week four (27/04/2020 - 03/05/2020) :
 Monday : After the weekly meeting I lost the rest of the morning trying to understand why the building never had even depth or width (was due to python integer division). Understanding this allows me to start working on a new type of floor for the skyscraper : a floor with two small apartments instead of one big. At the end of the day my floor with two apartments was generated (see pictures 8 and 9) but I still had some bug on the generation of the furniture of both apartment. 
-Thuesday :
-Wednesday :
+Thuesday : I finish the programming for the generation of the furniture in the small apartment (see picture 10 and 11). I then begin my work on the spawn generation of balcony for the apartment. The first step was to design different type of balcony. Then I add the code to generate them and the code which determine when to spawn a balcony. At the end of the day I was able to generate balcony for both big or small apartment but the block use for their construction was always the same (no adaptability) (see pictures 12 and 13).
+Wednesday : 
 Thursday :
 Friday :
 
-updated the 28/04/2020 
+updated the 29/04/2020 
