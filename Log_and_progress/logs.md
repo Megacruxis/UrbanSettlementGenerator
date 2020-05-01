@@ -17,8 +17,8 @@ Friday : I begin my work on the improvement of the building. Spend most of my da
 Week four (27/04/2020 - 03/05/2020) :
 Monday : After the weekly meeting I lost the rest of the morning trying to understand why the building never had even depth or width (was due to python integer division). Understanding this allows me to start working on a new type of floor for the skyscraper : a floor with two small apartments instead of one big. At the end of the day my floor with two apartments was generated (see pictures 8 and 9) but I still had some bug on the generation of the furniture of both apartment. 
 Thuesday : I finish the programming for the generation of the furniture in the small apartment (see picture 10 and 11). I then begin my work on the spawn generation of balcony for the apartment. The first step was to design different type of balcony. Then I add the code to generate them and the code which determine when to spawn a balcony. At the end of the day I was able to generate balcony for both big or small apartment but the block use for their construction was always the same (no adaptability) (see pictures 12 and 13).
-Wednesday : 
-Thursday :
+Wednesday : Thank to my function which determine the biome, I was able to program the adaptability for the balconies (see picture 14 and 15). I then continue my work on the design of the first floor (he gave me a lot of trouble, see picture 16) and then begin my programming of its generation. Currently, the first floor is almost generated properly (I have a problem with the flower pot) and it adapts to is environment (if we are in a desert the plant are going to be cactus instead of bush, see picture 17 and 18).
+Thursday : I Spend most of my day understanding how to put flower in flower pot and turns out the code to do it is not implemented. I ask for help on the discord, waiting for an answer. The rest of the day was spent to add the adaptability to the furniture of the apartment and work on the design of the roof (which is going to be my last building upgrade for now).
 Friday :
 
-updated the 29/04/2020 
+updated the 01/05/2020 

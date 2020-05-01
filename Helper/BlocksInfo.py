@@ -1,3 +1,5 @@
+CACTUS_ID = 81
+
 WOOD_NAME = {'17:0': 'oak',
              '17:1': 'spruce',
              '17:2': 'birch',
@@ -11,6 +13,16 @@ PLANKS_ID = {'oak': (5, 0),
              'jungle': (5, 3),
              'acacia': (5, 4),
              'dark_oak': (5, 5)}
+
+PLANTS_ID = {'oak': (18, 0),
+            'spruce': (18, 1),
+            'birch': (18, 2),
+            'jungle': (18, 3),
+            'acacia': (161, 0),
+            'dark_oak': (161, 1),
+            'Desert' : (81, 0),
+            'Badlands' : (81, 0),
+            'Mountains' : (18, 1)}
 
 FENCE_ID = {'oak': (85, 0),
             'spruce': (188, 0),
@@ -39,6 +51,16 @@ UPPER_SLAB_ID = {'oak': (126, 8),
                  'Desert' : (44, 9),
                  'Badlands' : (182, 8),
                  'Mountains' : (44, 13)}
+
+LOWER_SLAB_ID = {'oak': (126, 0),
+                 'spruce': (126, 1),
+                 'birch': (126, 2),
+                 'jungle': (126, 3),
+                 'acacia': (126, 4),
+                 'dark_oak': (126, 5),
+                 'Desert' : (44, 1),
+                 'Badlands' : (182, 0),
+                 'Mountains' : (44, 5)}
 
 STRUCTURE_BLOCK_ID = {'Desert' : (24, 2),
                       'Badlands' : (179, 2),

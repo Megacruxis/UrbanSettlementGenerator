@@ -21,10 +21,10 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, ceiling = No
 	# row of blocks of the pitched roof will be placed
 	ceiling_bottom = h_max -int((h_max-h_min) * 0.5)
 	house.buildArea = utilityFunctions.dotdict({"y_min": h_min, "y_max": ceiling_bottom, "x_min": x_min, "x_max": x_max, "z_min": z_min, "z_max": z_max})
-	
+
 	logging.info("Generating house at area {}".format(house.lotArea))
 	logging.info("Construction area {}".format(house.buildArea))
-	
+
 	wall = (43, RNG.randint(11,15))
 	ceiling = (5, RNG.randint(1,5)) if ceiling == None else ceiling
 	floor = wall
@@ -36,7 +36,7 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, ceiling = No
 	house.orientation = getOrientation(matrix, house.lotArea)
 	window_y = house.buildArea.y_min + 3
 	door_y = house.buildArea.y_min + 1
-	
+
 	if house.orientation == "N":
 		door_x = RNG.randint(house.buildArea.x_min+4, house.buildArea.x_max-4)
 		door_z = house.buildArea.z_min
@@ -47,7 +47,7 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, ceiling = No
 			matrix.setValue(h_min,door_x,z, (4,0))
 			matrix.setValue(h_min,door_x-1,z, (4,0))
 			matrix.setValue(h_min,door_x+1,z, (4,0))
-		
+
 	elif house.orientation == "S":
 		door_x = RNG.randint(house.buildArea.x_min+4, house.buildArea.x_max-4)
 		door_z = house.buildArea.z_max
@@ -63,7 +63,7 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, ceiling = No
 		door_x = house.buildArea.x_min
 		door_z = RNG.randint(house.buildArea.z_min+4, house.buildArea.z_max-4)
 		generateDoor(matrix, door_y, door_x, door_z, (64,8), (64,0))
-		house.entranceLot = (h_min+1, house.lotArea.x_min, door_z) 
+		house.entranceLot = (h_min+1, house.lotArea.x_min, door_z)
 		# entrance path
 		for x in range(house.lotArea.x_min, door_x):
 			matrix.setValue(h_min,x,door_z, (4,0))
@@ -74,7 +74,7 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, ceiling = No
 		door_x = house.buildArea.x_max
 		door_z = RNG.randint(house.buildArea.z_min+4, house.buildArea.z_max-4)
 		generateDoor(matrix, door_y, door_x, door_z, (64,9), (64,2))
-		house.entranceLot = (h_min+1, house.lotArea.x_max, door_z) 
+		house.entranceLot = (h_min+1, house.lotArea.x_max, door_z)
 		# entrance path
 		for x in range(door_x+1, house.lotArea.x_max+1):
 			matrix.setValue(h_min,x,door_z, (4,0))
@@ -108,7 +108,7 @@ def getHouseAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max):
 		z_max = z_mid + house_size_z/2
 
 	house_size_h = (house_size_x+house_size_z)/2
-	if h_max-h_min > 15 or h_max-h_min > house_size_h: 
+	if h_max-h_min > 15 or h_max-h_min > house_size_h:
 		h_max = h_min+ ((house_size_x+house_size_z)/2)
 
 	return (h_min, h_max, x_min, x_max, z_min, z_max)
@@ -142,31 +142,31 @@ def generateWalls(matrix, h_min, ceiling_bottom, x_min, x_max, z_min, z_max, wal
 			matrix.setValue(y,x_min,z, wall)
 
 def generateInterior(matrix, h_min, h_max, x_min, x_max, z_min, z_max, wood):
-	
+
 	generateCarpet(matrix.matrix, h_min+1, x_min+1, x_max, z_min+1, z_max)
 	generateBed(matrix, h_min, x_max, z_min)
 
 	x_mid = x_max - int((x_max - x_min)/2)
 	z_mid = z_max - int((z_max - z_min)/2)
 
-	generateCentralTable(matrix, h_min, x_mid, z_mid)
+	generateCentralTable(matrix, h_min, x_mid, z_mid, 53)
 	generateBookshelf(matrix, h_min, x_max, z_max)
-	generateCouch(matrix, h_min, x_min, z_max)
+	generateCouch(matrix, h_min, x_min, z_max, 53)
 	# wooden board in which chandelier is fixed
 	for z in range(z_min+1, z_max):
 		matrix.setValue(h_max, x_mid, z, wood)
-	generateChandelier(matrix, h_max, x_mid, z_mid)
+	generateChandelier(matrix, h_max, x_mid, z_mid, (85, 0))
 
 
 def generateCeiling_x(matrix, h_min, h_max, x_min, x_max, z_min, z_max, ceiling, wall, recr):
 
 	if x_min+recr+1 <= x_max-recr-1:
 		for z in range(z_min, z_max+1):					  # intended pitched roof effect
-			matrix.setValue(h_min+recr, x_min+recr, z, ceiling)   #       _  
+			matrix.setValue(h_min+recr, x_min+recr, z, ceiling)   #       _
 			matrix.setValue(h_min+recr, x_max-recr, z, ceiling)   #     _| |_
 			matrix.setValue(h_min+recr, x_min+recr+1, z, ceiling) #   _|     |_
 			matrix.setValue(h_min+recr, x_max-recr-1, z, ceiling) # _|         |_
-		for x in range(x_min+recr+2, x_max-recr-1):		
+		for x in range(x_min+recr+2, x_max-recr-1):
 			matrix.setValue(h_min+recr, x, z_min+1, wall) # fill front and back part of the roof
 			matrix.setValue(h_min+recr, x, z_max-1, wall)
 

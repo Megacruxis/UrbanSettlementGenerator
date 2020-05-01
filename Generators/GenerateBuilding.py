@@ -57,11 +57,11 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wo
 		generateBuildingWindows_AlongZ(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, double_apartment_floor)
 		# corridor windows
 		generateBuildingWindows_AlongZ(matrix, h_min, h_max, floor_size, x_min, x_max, z_max, [])
-		generateCorridorInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_max-6, z_max)
+		generateCorridorInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_max-6, z_max, fence)
 		generateFloorPlan(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall, double_apartment_floor)
 
 		generateStairs(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall)
-		generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max-6, double_apartment_floor)
+		generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max-6, double_apartment_floor, usable_wood, biome, fence)
 		generateBalconySouth(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, building.area.z_min, building.orientation, double_apartment_floor, wall, slab, stairs, fence, structureBloc)
 
 	return (building, h_max / floor_size)
@@ -157,29 +157,41 @@ def generateFloorPlan(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_m
 	z_wall = z_max-6
 
 	while cur_floor < h_max:
-
-		# generating separating wall between hall and apartments
-		for h in range(cur_floor, cur_floor+floor_size):
-			for x in range(x_min, x_max):
-				matrix.setValue(h, x, z_wall, wall)
-		if cur_floor in double_apartment_floor :
-			# generating separating wall between the two apartments
+		if cur_floor == h_min :
 			x_mid = x_max - (x_max - x_min) / 2
 			for h in range(cur_floor, cur_floor+floor_size):
+				# generating separating wall between the entrance and the apartment
 				for z in range(z_min+1, z_wall):
 					matrix.setValue(h, x_mid, z, wall)
-			# generating door to both apartment
+				# generating front wall of the apartment
+				for x in range(x_mid, x_max):
+					matrix.setValue(h, x, z_wall, wall)
 			bonus = 1 if (x_mid - x_min) / 2 < 4 else 0
-			generateDoor(matrix, cur_floor+1, x_mid + (x_mid - x_min) / 2 + bonus, z_wall, (64,8), (64,3))
-			generateDoor(matrix, cur_floor+1, x_mid - (x_mid - x_min) / 2, z_wall, (64,9), (64,3))
+			generateDoor(matrix, cur_floor+1, x_mid + (x_mid - x_min) / 2 + bonus, z_wall, (197,8), (197,3))
+
 		else :
-			# generating door to the apartment
-			x_door = x_max - ((x_max-x_min)/2)
-			generateDoor(matrix, cur_floor+1, x_door, z_wall, (64,9), (64,3))
+			# generating separating wall between hall and apartments
+			for h in range(cur_floor, cur_floor+floor_size):
+				for x in range(x_min, x_max):
+					matrix.setValue(h, x, z_wall, wall)
+			if cur_floor in double_apartment_floor :
+				# generating separating wall between the two apartments
+				x_mid = x_max - (x_max - x_min) / 2
+				for h in range(cur_floor, cur_floor+floor_size):
+					for z in range(z_min+1, z_wall):
+						matrix.setValue(h, x_mid, z, wall)
+				# generating door to both apartment
+				bonus = 1 if (x_mid - x_min) / 2 < 4 else 0
+				generateDoor(matrix, cur_floor+1, x_mid + (x_mid - x_min) / 2 + bonus, z_wall, (197,8), (197,3))
+				generateDoor(matrix, cur_floor+1, x_mid - (x_mid - x_min) / 2, z_wall, (197,9), (197,3))
+			else :
+				# generating door to the apartment
+				x_door = x_max - ((x_max-x_min)/2)
+				generateDoor(matrix, cur_floor+1, x_door, z_wall, (197,9), (197,3))
 
 		cur_floor += floor_size
 
-def generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, double_apartment_floor):
+def generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, double_apartment_floor, usable_wood, biome, fence_id):
 	cur_floor = h_min
 	floor = 0
 	x_mid = x_max - int((x_max - x_min)/2)
@@ -188,36 +200,77 @@ def generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_
 	while cur_floor < h_max:
 		cur_floor_ceiling = cur_floor+floor_size
 		if cur_floor == h_min :
-			#the first floor is different
-			a = True
+			#hall
+			generateFurnitureHall(matrix, cur_floor, floor_size, x_min, x_mid, z_min, z_max, usable_wood, biome, fence_id)
+			#apartment on the left side of the floor
+			picked_key = biome if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else utilityFunctions.selectRandomWood(usable_wood)
+			generateFurnitureSmallApartment(matrix, cur_floor, floor_size, x_mid, x_max, z_min, z_max, 2, fence_id, picked_key)
 		elif cur_floor in double_apartment_floor :
 			#first apartment
-			generateCarpet(matrix.matrix, cur_floor+1, x_min+1, x_mid, z_min+1, z_max)
-			generateChandelier(matrix, cur_floor_ceiling, x_mid-4, z_mid, 2)
-			generateCouch(matrix, cur_floor, x_min, z_max)
-			generateBedSouth(matrix, cur_floor, x_min + 1, z_min + 1)
-			generateCentralTableSouth(matrix, cur_floor, x_mid - (x_mid- x_min) / 2, z_mid)
-			generateBookshelfEast(matrix, cur_floor, x_mid, z_max)
+			picked_key = biome if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else utilityFunctions.selectRandomWood(usable_wood)
+			generateFurnitureSmallApartment(matrix, cur_floor, floor_size, x_min, x_mid, z_min, z_max, 1, fence_id, picked_key)
 			#second apartment
-			generateCarpet(matrix.matrix, cur_floor+1, x_mid+1, x_max, z_min+1, z_max)
-			generateChandelier(matrix, cur_floor_ceiling, x_mid+4, z_mid, 2)
-			generateCouch(matrix, cur_floor, x_mid, z_max)
-			generateBedSouth(matrix, cur_floor, x_max - 1, z_min + 1)
-			generateCentralTableSouth(matrix, cur_floor, x_mid + (x_mid- x_min) / 2, z_mid)
-			generateBookshelfEast(matrix, cur_floor, x_max, z_max)
+			picked_key = biome if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else utilityFunctions.selectRandomWood(usable_wood)
+			generateFurnitureSmallApartment(matrix, cur_floor, floor_size, x_mid, x_max, z_min, z_max, 2, fence_id, picked_key)
 		else :
+			picked_key = biome if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else utilityFunctions.selectRandomWood(usable_wood)
 			generateCarpet(matrix.matrix, cur_floor+1, x_min+1, x_max, z_min+1, z_max)
 			generateBed(matrix, cur_floor, x_max, z_min)
-			generateCentralTable(matrix, cur_floor, x_mid, z_mid)
+			generateCentralTable(matrix, cur_floor, x_mid, z_mid, BlocksInfo.STAIRS_ID[picked_key][0])
 			generateBookshelf(matrix, cur_floor, x_max, z_max)
-			generateCouch(matrix, cur_floor, x_min, z_max)
+			generateCouch(matrix, cur_floor, x_min, z_max, BlocksInfo.STAIRS_ID[picked_key][0])
 
 			x_mid = x_min + (x_max-x_min)/2
 			z_mid = z_min + (z_max-z_min)/2
-			generateChandelier(matrix, cur_floor_ceiling, x_mid-5, z_mid, 2)
-			generateChandelier(matrix, cur_floor_ceiling, x_mid+5, z_mid, 2)
+			generateChandelier(matrix, cur_floor_ceiling, x_mid-5, z_mid, fence_id, 2)
+			generateChandelier(matrix, cur_floor_ceiling, x_mid+5, z_mid, fence_id, 2)
 
 		cur_floor += floor_size
+
+def generateFurnitureSmallApartment(matrix, h, floor_size, x_min, x_max, z_min, z_max, position, fence_id, picked_key):
+	x_mid = x_max - (x_max - x_min) / 2
+	z_mid = z_max - (z_max - z_min) / 2
+	bonus = -1 if position == 2 and (x_max - x_min % 2) == 0 else 0
+	generateCarpet(matrix.matrix, h + 1, x_min + 1, x_max, z_min + 1, z_max)
+	generateChandelier(matrix, h + floor_size, x_mid + bonus, z_mid, fence_id, 2)
+	generateCouch(matrix, h, x_min, z_max, BlocksInfo.STAIRS_ID[picked_key][0])
+	generateBedSouth(matrix, h, x_min + 1 if position == 1 else x_max - 1, z_min + 1)
+	generateCentralTableSouth(matrix, h, x_mid + bonus, z_mid, BlocksInfo.STAIRS_ID[picked_key][0])
+	generateBookshelfEast(matrix, h, x_max, z_max)
+
+def generateFurnitureHall(matrix, h_min, floor_size, x_min, x_max, z_min, z_max, usable_wood, biome, fence_id):
+	grounds = [(47, 0), (45, 0)]
+	x_mid = x_max - (x_max - x_min) / 2
+	z_mid = z_max - (z_max - z_min) / 2
+	plant_ground_id = (3, 0)
+	ground_id = grounds[random.randint(0, len(grounds) - 1)]
+
+	if biome in BlocksInfo.PLANTS_ID.keys() :
+		plant_id = BlocksInfo.PLANTS_ID[biome]
+		if plant_id[0] == BlocksInfo.CACTUS_ID :
+			if biome == 'Badlands' :
+				plant_ground_id = (12, 1)
+			else :
+				plant_ground_id = (12, 0)
+	else :
+		picked_wood = utilityFunctions.selectRandomWood(usable_wood)
+		plant_id = BlocksInfo.PLANTS_ID[picked_wood]
+	generateCarpet(matrix.matrix, h_min + 1, x_min + 1, x_max, z_min + 1, z_max + 1)
+	generateChandelier(matrix, h_min + floor_size, x_mid, z_mid, fence_id, 2)
+	generatePlant(matrix, h_min, x_min + 2, z_max - 1, plant_id, plant_ground_id)
+	generatePlant(matrix, h_min, x_max - 2, z_max - 1, plant_id, plant_ground_id)
+	next_blank = 2
+	for z in range(z_max - 3, z_min + 1, -1) :
+		if next_blank == 0 :
+			next_blank = 3
+			generatePotWithPlant(matrix, h_min, x_mid, z, (47, 0), ground_id)
+			if (x_max - x_min - 1) % 2 == 0 :
+				generatePotWithPlant(matrix, h_min, x_mid - 1, z, (47, 0), ground_id)
+		else :
+			next_blank -= 1
+			generateMailbox(matrix, h_min, x_min + 1, z, "E")
+			generateMailbox(matrix, h_min, x_max - 1, z, "W")
+
 
 def generateBalconySouth(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, area_z_min, orientation, double_apartment_floor, wall, slab_id, stairs_id, fence_id, structureBloc_id):
 	cur_floor = h_min + floor_size
@@ -254,7 +307,7 @@ def generateLamp(matrix, h, x, z, orientation):
 	elif orientation == "E" :
 		matrix.setValue(h, x - 1, z, (69, 1))
 
-def generateCorridorInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max):
+def generateCorridorInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, fence_id):
 	cur_floor = h_min
 	floor = 0
 	x_mid = x_max - int((x_max - x_min)/2)
@@ -265,7 +318,7 @@ def generateCorridorInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_m
 
 		x_mid = x_min + (x_max-x_min)/2
 		z_mid = z_min + (z_max-z_min)/2
-		generateChandelier(matrix, cur_floor_ceiling, x_mid, z_mid, 1)
+		generateChandelier(matrix, cur_floor_ceiling, x_mid, z_mid, fence_id, 1)
 
 		# corridor's carpet
 		for x in range(x_min+1, x_max):
@@ -318,7 +371,7 @@ def generateBuildingWindows_AlongZ(matrix, h_min, h_max, floor_size, x_min, x_ma
 	cur_floor = h_min
 	while cur_floor < h_max:
 		window_h = cur_floor + 1 + int(math.ceil(floor_size/2))
-		if cur_floor in double_apartment_floor :
+		if cur_floor in double_apartment_floor or cur_floor == h_min:
 			x_mid = x_max - (x_max - x_min)/2
 			shifting = 1
 			while x_mid + shifting + 1 < x_max and x_mid - shifting - 1 > x_min :
