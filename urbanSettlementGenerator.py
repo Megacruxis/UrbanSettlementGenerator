@@ -178,11 +178,11 @@ def perform(level, box, options):
 
 	for partition in final_partitioning:
 		if greenhouse_count * GREENHOUSE_CAPACITY < inhabitants :
-			greenhouse = generateGreenhouse(world, partition, height_map, usable_wood)
+			greenhouse = generateGreenhouse(world, partition, height_map, usable_wood, biome)
 			greenhouse_count += 1
 			all_buildings.append(greenhouse)
 		else :
-			house = generateHouse(world, partition, height_map, usable_wood)
+			house = generateHouse(world, partition, height_map, usable_wood, biome)
 			inhabitants += RNG.randint(1, HOUSE_SIZE)
 			all_buildings.append(house)
 
@@ -229,13 +229,13 @@ def generateBuilding(matrix, p, height_map, usable_wood, biome):
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-2, p[4]+1, p[5]-2, -1)
 	return building
 
-def generateGreenhouse(matrix, p, height_map, usable_wood):
+def generateGreenhouse(matrix, p, height_map, usable_wood, biome):
 	h = prepareLot(matrix, p, height_map)
-	greenhouse = GenerateGreenhouse.generateGreenhouse(matrix, h, p[1], p[2], p[3], p[4], p[5], usable_wood)
+	greenhouse = GenerateGreenhouse.generateGreenhouse(matrix, h, p[1], p[2], p[3], p[4], p[5], usable_wood, biome)
 	utilityFunctions.updateHeightMap(height_map, p[2]+3, p[3]-3, p[4]+2, p[5]-2, -1)
 	return greenhouse
 
-def generateHouse(matrix, p, height_map, usable_wood):
+def generateHouse(matrix, p, height_map, usable_wood, biome):
 	logging.info("Generating a house in lot {}".format(p))
 	logging.info("Terrain before flattening: ")
 	for x in range (p[2], p[3]):
@@ -253,7 +253,7 @@ def generateHouse(matrix, p, height_map, usable_wood):
 			line += str(height_map[x][z])+" "
 		logging.info(line)
 	ceiling = BlocksInfo.PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
-	house = GenerateHouse.generateHouse(matrix, h, p[1],p[2],p[3], p[4], p[5], ceiling)
+	house = GenerateHouse.generateHouse(matrix, h, p[1],p[2],p[3], p[4], p[5], biome, usable_wood, ceiling)
 
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-1, p[4]+1, p[5]-1, -1)
 

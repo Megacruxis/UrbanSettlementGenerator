@@ -4,10 +4,11 @@ import RNG
 import logging
 from pymclevel import alphaMaterials, BoundingBox
 import utilityFunctions as utilityFunctions
+import BlocksInfo as BlocksInfo
 from GenerateCarpet import generateCarpet
 from GenerateObject import *
 
-def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, ceiling = None):
+def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, biome, usable_wood, ceiling = None):
 
 	house = utilityFunctions.dotdict()
 	house.type = "house"
@@ -90,7 +91,7 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, ceiling = No
 		generateWindow_alongZ(matrix, window_y, house.buildArea.z_max, house.buildArea.x_min, house.buildArea.x_max)
 		generateCeiling_z(matrix, ceiling_bottom, h_max, x_min-1, x_max+1, z_min-1, z_max+1, ceiling, wall, 0)
 
-	generateInterior(matrix, h_min, ceiling_bottom, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, ceiling)
+	generateInterior(matrix, h_min, ceiling_bottom, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, ceiling, usable_wood, biome)
 
 	return house
 
@@ -112,6 +113,13 @@ def getHouseAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max):
 		h_max = h_min+ ((house_size_x+house_size_z)/2)
 
 	return (h_min, h_max, x_min, x_max, z_min, z_max)
+
+def selectHouseBlocks(usable_wood, biome):
+	if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() :
+		return BlocksInfo.UPPER_SLAB_ID[biome], BlocksInfo.STAIRS_ID[biome], BlocksInfo.FENCE_ID['iron_bar'], BlocksInfo.STRUCTURE_BLOCK_ID[biome]
+	else :
+		picked_wood = utilityFunctions.selectRandomWood(usable_wood)
+		return BlocksInfo.UPPER_SLAB_ID[picked_wood], BlocksInfo.STAIRS_ID[picked_wood], BlocksInfo.FENCE_ID[picked_wood], BlocksInfo.PLANKS_ID[picked_wood]
 
 def generateFloor(matrix, h, x_min, x_max, z_min, z_max, floor):
 	for x in range(x_min, x_max+1):
@@ -141,7 +149,9 @@ def generateWalls(matrix, h_min, ceiling_bottom, x_min, x_max, z_min, z_max, wal
 			matrix.setValue(y,x_max,z, wall)
 			matrix.setValue(y,x_min,z, wall)
 
-def generateInterior(matrix, h_min, h_max, x_min, x_max, z_min, z_max, wood):
+def generateInterior(matrix, h_min, h_max, x_min, x_max, z_min, z_max, wood, usable_wood, biome):
+
+	(slab_id, stairs_id, fence_id, structureBloc_id) = selectHouseBlocks(usable_wood, biome)
 
 	generateCarpet(matrix.matrix, h_min+1, x_min+1, x_max, z_min+1, z_max)
 	generateBed(matrix, h_min, x_max, z_min)
@@ -149,13 +159,13 @@ def generateInterior(matrix, h_min, h_max, x_min, x_max, z_min, z_max, wood):
 	x_mid = x_max - int((x_max - x_min)/2)
 	z_mid = z_max - int((z_max - z_min)/2)
 
-	generateCentralTable(matrix, h_min, x_mid, z_mid, 53)
+	generateCentralTable(matrix, h_min, x_mid, z_mid, stairs_id[0])
 	generateBookshelf(matrix, h_min, x_max, z_max)
-	generateCouch(matrix, h_min, x_min, z_max, 53)
+	generateCouch(matrix, h_min, x_min, z_max, stairs_id[0])
 	# wooden board in which chandelier is fixed
 	for z in range(z_min+1, z_max):
 		matrix.setValue(h_max, x_mid, z, wood)
-	generateChandelier(matrix, h_max, x_mid, z_mid, (85, 0))
+	generateChandelier(matrix, h_max, x_mid, z_mid, fence_id)
 
 
 def generateCeiling_x(matrix, h_min, h_max, x_min, x_max, z_min, z_max, ceiling, wall, recr):

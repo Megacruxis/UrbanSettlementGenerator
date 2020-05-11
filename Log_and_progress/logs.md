@@ -18,7 +18,17 @@ Week four (27/04/2020 - 03/05/2020) :
 Monday : After the weekly meeting I lost the rest of the morning trying to understand why the building never had even depth or width (was due to python integer division). Understanding this allows me to start working on a new type of floor for the skyscraper : a floor with two small apartments instead of one big. At the end of the day my floor with two apartments was generated (see pictures 8 and 9) but I still had some bug on the generation of the furniture of both apartment. 
 Thuesday : I finish the programming for the generation of the furniture in the small apartment (see picture 10 and 11). I then begin my work on the spawn generation of balcony for the apartment. The first step was to design different type of balcony. Then I add the code to generate them and the code which determine when to spawn a balcony. At the end of the day I was able to generate balcony for both big or small apartment but the block use for their construction was always the same (no adaptability) (see pictures 12 and 13).
 Wednesday : Thank to my function which determine the biome, I was able to program the adaptability for the balconies (see picture 14 and 15). I then continue my work on the design of the first floor (he gave me a lot of trouble, see picture 16) and then begin my programming of its generation. Currently, the first floor is almost generated properly (I have a problem with the flower pot) and it adapts to is environment (if we are in a desert the plant are going to be cactus instead of bush, see picture 17 and 18).
-Thursday : I Spend most of my day understanding how to put flower in flower pot and turns out the code to do it is not implemented. I ask for help on the discord, waiting for an answer. The rest of the day was spent to add the adaptability to the furniture of the apartment and work on the design of the roof (which is going to be my last building upgrade for now).
-Friday :
+Thursday : I Spend most of my day understanding how to put flower in flower pot and turns out the code to do it was not implemented. I ask for help on the discord, i'm still waiting for an answer. The rest of the day was spent to add the adaptability to the furniture of the apartment and work on the design of the roof (which is going to be my last building upgrade for now).
+Friday : I use my whole day to implement the generation of the roof. The roof generation currently lack of adaptability since it's always generated the same way but it is working (see picture 19 and 20).
 
-updated the 01/05/2020 
+Week five (04/05/2020 - 10/05/2020) :
+Monday : I begin the day by correcting the generation of the plants with a height of two blocks (I was only spawning the first block) when creating the roof. I then spent the rest of the day programming the adaptability of the roof (see picture 21)
+Thuesday : I begin my work on the adaptability of the houses. The furniture of the house now use blocks depending on the environment. But I still have some work left in order for the whole house to be adaptive.
+Wednesday : -
+Thursday : -
+Friday : -
+
+Week six (11/05/2020 - 17/05/2020) :
+Monday :
+
+updated the 11/05/2020 

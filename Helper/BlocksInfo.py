@@ -1,5 +1,7 @@
 CACTUS_ID = 81
 
+DOUBLE_PLANT = 175
+
 WOOD_NAME = {'17:0': 'oak',
              '17:1': 'spruce',
              '17:2': 'birch',
@@ -23,6 +25,16 @@ PLANTS_ID = {'oak': (18, 0),
             'Desert' : (81, 0),
             'Badlands' : (81, 0),
             'Mountains' : (18, 1)}
+
+BUSH_ID = {'oak': (18, 0),
+           'spruce': (18, 1),
+           'birch': (18, 2),
+           'jungle': (18, 3),
+           'acacia': (161, 0),
+           'dark_oak': (161, 1),
+           'Desert' : (24, 1),
+           'Badlands' : (179, 1),
+           'Mountains' : (18, 1)}
 
 FENCE_ID = {'oak': (85, 0),
             'spruce': (188, 0),
@@ -65,3 +77,31 @@ LOWER_SLAB_ID = {'oak': (126, 0),
 STRUCTURE_BLOCK_ID = {'Desert' : (24, 2),
                       'Badlands' : (179, 2),
                       'Mountains' : (98, 0)}
+
+FLOWERS_ID = {'Desert' : [(32, 0), (81, 0)],
+              'Badlands' : [(32, 0), (81, 0)],
+              'Base' : [(38, 0), (37, 0), (38, 3), (38, 4), (38, 5), (38, 6), (38, 7), (38, 8)],
+              'Mountains' : [(38, 0), (37, 0), (38, 2), (38, 2)],
+              'Swamp' : [(38, 1), (38, 1), (38, 1), (38, 0), (37, 0)],
+              'Snowy_zone' : [(78, 0), (78, 1), (78, 2), (0, 0)],
+              'Mushroom Fields' : [(39, 0), (40, 0), (0, 0)]}
+
+PLANT_GROUND_ID = {'Base' : (2, 0),
+                   'Desert' : (12, 0),
+                   'Badlands' : (12, 1),
+                   'Mushroom Fields' : (110, 0)}
+
+HOUSE_FLOOR_ID = {'oak': (18, 0),
+                  'spruce': (18, 1),
+                  'birch': (18, 2),
+                  'jungle': (18, 3),
+                  'acacia': (161, 0),
+                  'dark_oak': (161, 1),
+                  'Desert' : (24, 0),
+                  'Badlands' : (179, 0),
+                  'Mountains' : (43, 0)}
+
+HOUSE_WALL_ID = {'Base': (18, 0),
+                 'Desert': (18, 1),
+                 'Badlands': (18, 2),
+                 'jungle': (18, 3)}

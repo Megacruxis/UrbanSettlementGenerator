@@ -26,7 +26,7 @@ POTATO_ID = (142, 0)
 plants = [WHEAT_ID, CARROT_ID, POTATO_ID]
 
 
-def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wood):
+def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wood, biome):
     greenhouse = utilityFunctions.dotdict()
     greenhouse.type = "greenhouse"
     greenhouse.lotArea = utilityFunctions.dotdict({"y_min": h_min, "y_max": h_max, "x_min": x_min, "x_max": x_max, "z_min": z_min, "z_max": z_max})

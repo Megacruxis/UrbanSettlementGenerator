@@ -61,6 +61,7 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wo
 		generateFloorPlan(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall, double_apartment_floor)
 
 		generateStairs(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall)
+		generateRoof(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, biome, usable_wood, wall, stairs)
 		generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max-6, double_apartment_floor, usable_wood, biome, fence)
 		generateBalconySouth(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, building.area.z_min, building.orientation, double_apartment_floor, wall, slab, stairs, fence, structureBloc)
 
@@ -108,7 +109,7 @@ def pickDoubleapartmentFloor(h_min, h_max, floor_size):
 def generateStairs(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall):
 	cur_floor = h_min
 	floor = 0
-	while cur_floor < h_max-floor_size:
+	while cur_floor < h_max:
 		step = cur_floor+floor_size-1
 		if floor % 2 == 0:
 			x = x_max-2
@@ -151,6 +152,60 @@ def generateStairs(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max,
 
 		floor += 1
 		cur_floor += floor_size
+
+def generateRoof(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, biome, usable_wood, wall, stairs):
+	floor = (h_max - h_min) / floor_size
+	for x in range(x_min, x_max + 1) :
+		for z in range(z_min, z_max + 1):
+			if x == x_min or x == x_max or z == z_max or z == z_min :
+				matrix.setValue(h_max + 1, x, z, BlocksInfo.FENCE_ID['iron_bar'])
+	generateStreetLight(matrix, h_max, x_min + 1, z_min + 1)
+	generateStreetLight(matrix, h_max, x_max - 1, z_min + 1)
+	local_size = 5
+	z_min_local = z_max - (local_size - 1)
+	if floor % 2 == 0 :
+		x_max_local = x_min + (local_size - 1)
+		generateStreetLight(matrix, h_max, x_max - 1, z_max - 1)
+		generateBuildingWalls(matrix, h_max, h_max + local_size, floor_size, x_min, x_max_local, z_min_local, z_max, wall)
+		generateFloorsDivision(matrix, h_max + local_size, h_max + local_size, local_size, x_min, x_max_local, z_min_local, z_max, wall)
+		generateDoor(matrix, h_max + 1, x_min + 1, z_min_local, (197,9), (197,1))
+		generateDoor(matrix, h_max + 1, x_max_local, z_max -1, (197,8), (197,2))
+		generateAntenna(matrix, h_max + local_size, x_max_local - (x_max_local - x_min) / 2, z_max - (z_max - z_min_local) / 2)
+		generateLantern(matrix,  h_max + 2, x_max_local - 1, z_min_local, "S")
+		generateLantern(matrix, h_max + 2, x_max_local, z_min_local + 1, "W")
+		fillWithTable(matrix, h_max, x_min + 2, x_max_local, z_min + 3, z_min_local - 3, stairs)
+		fillWithGarden(matrix, h_max, x_max_local + 2, x_max - 3, z_min + 3, z_max - 3, biome, usable_wood)
+	else :
+		x_min_local = x_max - (local_size - 1)
+		generateStreetLight(matrix, h_max, x_min + 1, z_max - 1)
+		generateBuildingWalls(matrix, h_max, h_max + local_size, floor_size, x_min_local, x_max, z_min_local, z_max, wall)
+		generateFloorsDivision(matrix, h_max + local_size, h_max + local_size, local_size, x_min_local, x_max, z_min_local, z_max, wall)
+		generateDoor(matrix, h_max + 1, x_max - 1, z_min_local, (197,9), (197,1))
+		generateDoor(matrix, h_max + 1, x_min_local, z_max - 1, (197,8), (197,0))
+		generateAntenna(matrix, h_max + local_size, x_max - (x_max - x_min_local) / 2, z_max - (z_max - z_min_local) / 2)
+		generateLantern(matrix,  h_max + 2, x_min_local + 1, z_min_local, "S")
+		generateLantern(matrix, h_max + 2, x_min_local, z_min_local + 1, "E")
+		fillWithTable(matrix, h_max, x_min_local, x_max - 2, z_min + 3, z_min_local - 3, stairs)
+		fillWithGarden(matrix, h_max, x_min + 3, x_min_local - 2, z_min + 3, z_max - 3, biome, usable_wood)
+
+def fillWithTable(matrix, h, x_min, x_max, z_min, z_max, stairs_id):
+	for x in range(x_min, x_max + 1, 2):
+		for z in range(z_max - 1, z_min - 1, -4):
+			if z - 1 >= z_min :
+				generateCentralTableSouth(matrix, h, x, z, stairs_id[0])
+
+def fillWithGarden(matrix, h, x_min, x_max, z_min, z_max, biome, usable_wood):
+	flowers_id = BlocksInfo.FLOWERS_ID[biome] if biome in BlocksInfo.FLOWERS_ID.keys() else BlocksInfo.FLOWERS_ID['Base']
+	flower_ground_id = BlocksInfo.PLANT_GROUND_ID[biome] if biome in BlocksInfo.PLANT_GROUND_ID.keys() else BlocksInfo.PLANT_GROUND_ID['Base']
+	bush_id = BlocksInfo.BUSH_ID[biome] if biome in BlocksInfo.BUSH_ID.keys() else BlocksInfo.BUSH_ID[utilityFunctions.selectRandomWood(usable_wood)]
+	for x in range(x_min, x_max + 1, 5):
+		for z in range(z_max, z_min + 1, -5):
+			if z - 5 >= z_min and x + 5 <= x_max:
+				generateBushCorner(matrix, h, x, z, 0, bush_id)
+				generateBushCorner(matrix, h, x, z - 5, 1, bush_id)
+				generateBushCorner(matrix, h, x + 5, z - 5, 2, bush_id)
+				generateBushCorner(matrix, h, x + 5, z, 3, bush_id)
+				generateFlowerTray(matrix, h, x + 2, z - 2, flowers_id, flower_ground_id)
 
 def generateFloorPlan(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall, double_apartment_floor):
 	cur_floor = h_min
