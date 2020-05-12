@@ -120,7 +120,7 @@ def identifyBiome(total_ground, total_water, total_found):
             return 'Mushroom Fields'
     if total_found > 0 :
         if float(found_wood['162:1']) / total_found > 0.5:
-            return 'Dark Forest'
+            return 'Dark_forest'
         elif float(found_wood['17:3']) / total_found > 0.5 :
             return 'Jungle'
         elif float(found_wood['162:0']) / total_found > 0.3 :
@@ -145,13 +145,13 @@ def identifyBiome(total_ground, total_water, total_found):
     elif found_blocks.has_key(COAL_ORE_ID) :
             return 'Mountains'
     elif found_blocks.has_key(MYCELIUM_ID) :
-        return 'Mushroom Fields'
+        return 'Mushroom_fields'
     elif found_plants.has_key(LILY_PAD_ID) :
         return 'Swamp'
     elif found_plants.has_key(COCOA_ID):
         return 'Jungle'
     elif (found_plants.has_key(RED_MUSHROOM_ID) or found_plants.has_key(BROWN_MUSHROOM_ID)) and found_wood['162:1'] > 0 :
-        return 'Dark Forest'
+        return 'Dark_forest'
     return 'Base'
 
 def addToDictionary(dictionary, key):

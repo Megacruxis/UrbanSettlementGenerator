@@ -252,8 +252,7 @@ def generateHouse(matrix, p, height_map, usable_wood, biome):
 		for z in range(p[4], p[5]):
 			line += str(height_map[x][z])+" "
 		logging.info(line)
-	ceiling = BlocksInfo.PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
-	house = GenerateHouse.generateHouse(matrix, h, p[1],p[2],p[3], p[4], p[5], biome, usable_wood, ceiling)
+	house = GenerateHouse.generateHouse(matrix, h, p[1],p[2],p[3], p[4], p[5], biome, usable_wood)
 
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-1, p[4]+1, p[5]-1, -1)
 

@@ -1,6 +1,14 @@
 CACTUS_ID = 81
-
 DOUBLE_PLANT = 175
+TRAPDOOR_ID = 96
+
+FARMLAND_ID = (60, 0)
+DIRT_ID = (3, 0)
+GLASS_ID = (20, 0)
+WATER_ID = (9, 0)
+SEA_LANTERN_ID = (169, 0)
+
+CROPS_ID = [(59, 0), (141, 0), (142, 0)]
 
 WOOD_NAME = {'17:0': 'oak',
              '17:1': 'spruce',
@@ -8,6 +16,13 @@ WOOD_NAME = {'17:0': 'oak',
              '17:3': 'jungle',
              '162:0': 'acacia',
              '162:1': 'dark_oak'}
+
+WOOD_ID = {'oak': (17, 0),
+           'spruce': (17, 1),
+           'birch': (17, 2),
+           'jungle': (17, 3),
+           'acacia': (162, 0),
+           'dark_oak': (162, 1)}
 
 PLANKS_ID = {'oak': (5, 0),
              'spruce': (5, 1),
@@ -52,7 +67,7 @@ STAIRS_ID = {'oak': (53, 0),
             'dark_oak': (164, 0),
             'Desert' : (128, 0),
             'Badlands' : (180, 0),
-            'Mountains' : (109, 0)}
+            'Mountains' : (67, 0)}
 
 UPPER_SLAB_ID = {'oak': (126, 8),
                  'spruce': (126, 9),
@@ -62,7 +77,7 @@ UPPER_SLAB_ID = {'oak': (126, 8),
                  'dark_oak': (126, 13),
                  'Desert' : (44, 9),
                  'Badlands' : (182, 8),
-                 'Mountains' : (44, 13)}
+                 'Mountains' : (44, 11)}
 
 LOWER_SLAB_ID = {'oak': (126, 0),
                  'spruce': (126, 1),
@@ -72,11 +87,11 @@ LOWER_SLAB_ID = {'oak': (126, 0),
                  'dark_oak': (126, 5),
                  'Desert' : (44, 1),
                  'Badlands' : (182, 0),
-                 'Mountains' : (44, 5)}
+                 'Mountains' : (44, 3)}
 
-STRUCTURE_BLOCK_ID = {'Desert' : (24, 2),
-                      'Badlands' : (179, 2),
-                      'Mountains' : (98, 0)}
+STRUCTURE_BLOCK_ID = {'Desert' : (24, 0),
+                      'Badlands' : (179, 0),
+                      'Mountains' : (4, 0)}
 
 FLOWERS_ID = {'Desert' : [(32, 0), (81, 0)],
               'Badlands' : [(32, 0), (81, 0)],
@@ -84,12 +99,12 @@ FLOWERS_ID = {'Desert' : [(32, 0), (81, 0)],
               'Mountains' : [(38, 0), (37, 0), (38, 2), (38, 2)],
               'Swamp' : [(38, 1), (38, 1), (38, 1), (38, 0), (37, 0)],
               'Snowy_zone' : [(78, 0), (78, 1), (78, 2), (0, 0)],
-              'Mushroom Fields' : [(39, 0), (40, 0), (0, 0)]}
+              'Mushroom_fields' : [(39, 0), (40, 0), (0, 0)]}
 
 PLANT_GROUND_ID = {'Base' : (2, 0),
                    'Desert' : (12, 0),
                    'Badlands' : (12, 1),
-                   'Mushroom Fields' : (110, 0)}
+                   'Mushroom_fields' : (110, 0)}
 
 HOUSE_FLOOR_ID = {'oak': (18, 0),
                   'spruce': (18, 1),
@@ -99,9 +114,45 @@ HOUSE_FLOOR_ID = {'oak': (18, 0),
                   'dark_oak': (161, 1),
                   'Desert' : (24, 0),
                   'Badlands' : (179, 0),
-                  'Mountains' : (43, 0)}
+                  'Base' : (43, 0)}
 
-HOUSE_WALL_ID = {'Base': (18, 0),
-                 'Desert': (18, 1),
-                 'Badlands': (18, 2),
-                 'jungle': (18, 3)}
+HOUSE_WALL_ID = {'Mountains': [(4, 0), (1, 1), (1, 3), (1, 5), (45, 0), (112, 0)],
+                 'Desert': [(24, 0), (24, 2)],
+                 'Badlands': [(179, 0), (179, 2)],
+                 'Base' : [(98, 0), (-1, 0), (45, 0), (112, 0), (155, 0)],
+                 'Snowy_zone' : [(80, 0), (98, 0), (-1, 0), (45, 0), (112, 0), (155, 0)],
+                 'Swanp' : [(48, 0), (-1, 0), (4, 0), (112, 0)],
+                 'Beach' : [(-1, 0)]}
+
+# with the id of the wall you obtain the id of the corresponding pillar
+HOUSE_PILLAR_ID = {(80, 0) : (0, 0),
+                   (1, 1) : (1, 2),
+                   (1, 3) : (1, 4),
+                   (1, 5) : (1, 6),
+                   (24, 0) : (24, 1),
+                   (24, 2) : (24, 1),
+                   (179, 0) : (179, 1),
+                   (179, 2) : (179, 1),
+                   (98, 0) : (98, 3),
+                   (112, 0) : (159, 15),
+                   (155, 0) : (155, 2),
+                   (45, 0) : (1, 2),
+                   (114, 0) : (179, 2)}
+
+GREENHOUSE_GLASS_ID = {'Base' : [(95, 0)],
+                       'Desert' : [(95, 0), (95, 0), (95, 4), (95, 4), (95, 4)],
+                       'Badlands' : [(95, 0), (95, 0), (95, 1), (95, 1), (95, 1)],
+                       'Mushroom_fields' : [(95, 0), (95, 12)],
+                       'Jungle' : [(95, 0), (95, 0), (95, 5), (95, 5), (95, 5)],
+                       'Swanp' : [(95, 0), (95, 13)]}
+
+GREENHOUSE_GROUND_ID = {'Base' : (208, 0),
+                        'Desert' : (24, 0),
+                        'Beach' : (24, 0),
+                        'Badlands' : (179, 0),
+                        'Mushroom_fields' : (110, 0)}
+
+GREENHOUSE_FUNDATION_ID = {'Desert' : (24, 0),
+                           'Badlands' : (179, 0),
+                           'Mountains' : (4, 0),
+                           'Swamp' : (48, 0)}

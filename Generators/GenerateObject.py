@@ -94,14 +94,17 @@ def generateBushCorner(matrix, y, x, z, rotation, block_id):
 		matrix.setValue(y + 1, x, z - 1, block_id)
 
 def generateFlowerTray(matrix, y, x, z, flowers_id, ground_id = (2, 0)):
+	cactus_added = False
 	for px in range(x, x + 2):
 		for pz in range(z, z - 2, -1):
 			matrix.setValue(y + 1, px, pz, ground_id)
 			picked_id = flowers_id[random.randint(0, len(flowers_id) - 1)]
+			while picked_id[0] == BlocksInfo.CACTUS_ID and cactus_added :
+				picked_id = flowers_id[random.randint(0, len(flowers_id) - 1)]
 			matrix.setValue(y + 2, px, pz, picked_id)
 			if picked_id[0] == BlocksInfo.CACTUS_ID :
-				flowers_id.remove(picked_id)
 				matrix.setValue(y + 3, px, pz, picked_id)
+				cactus_added = True
 			if picked_id[0] == BlocksInfo.DOUBLE_PLANT :
 				matrix.setValue(y + 3, px, pz, (picked_id[0], 8 + picked_id[1]))
 	matrix.setValue(y + 1, x - 1, z, (96, 14))

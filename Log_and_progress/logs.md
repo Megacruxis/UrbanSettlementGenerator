@@ -29,6 +29,7 @@ Thursday : -
 Friday : -
 
 Week six (11/05/2020 - 17/05/2020) :
-Monday :
+Monday : The blocks used for the walls of the house, the pillars and the roof now depend on the environment. I also made some change to the roof design (replace the full blocks with stairs). This complete the adaptability of the house (see picture 22 to 24). 
+Thuesday : 
 
-updated the 11/05/2020 
+updated the 12/05/2020 

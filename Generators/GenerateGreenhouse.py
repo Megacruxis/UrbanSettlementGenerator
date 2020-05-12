@@ -11,20 +11,6 @@ from GenerateObject import *
 GREENHOUSE_WIDTH = 10
 GREENHOUSE_DEPTH = 12
 GREENHOUSE_HEIGHT = 5
-DIRT_ID = (3, 0)
-WHITE_GLASS_ID = (95, 0)
-GLASS_ID = (20, 0)
-WATER_ID = (9, 0)
-SEA_LANTERN_ID = (169, 0)
-PLANKS_ID = {'oak': (5, 0), 'spruce': (5, 1), 'birch': (5,2), 'jungle': (5,3), 'acacia': (5,4), 'dark_oak': (5,5)}
-TRAPDOOR_ID = (96, 0)
-GRASS_PATH_ID = (208, 0)
-FARMLAND_ID = (60, 0)
-WHEAT_ID = (59, 0)
-CARROT_ID = (141, 0)
-POTATO_ID = (142, 0)
-plants = [WHEAT_ID, CARROT_ID, POTATO_ID]
-
 
 def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wood, biome):
     greenhouse = utilityFunctions.dotdict()
@@ -42,10 +28,9 @@ def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_
     logging.info("Generating greenhouse at area {}".format(greenhouse.area))
     logging.info("Construction area {}".format(greenhouse.constructionArea))
 
-    """Todo, Improve adaptability"""
-    foundation = PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
-    ground = GRASS_PATH_ID
-    used_glass = WHITE_GLASS_ID
+    foundation = BlocksInfo.GREENHOUSE_FUNDATION_ID[biome] if biome in BlocksInfo.GREENHOUSE_FUNDATION_ID.keys() else BlocksInfo.PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
+    ground = BlocksInfo.GREENHOUSE_GROUND_ID[biome] if biome in BlocksInfo.GREENHOUSE_GROUND_ID.keys() else BlocksInfo.GREENHOUSE_GROUND_ID['Base']
+    used_glass = BlocksInfo.GREENHOUSE_GLASS_ID[biome] if biome in BlocksInfo.GREENHOUSE_GLASS_ID.keys() else BlocksInfo.GREENHOUSE_GLASS_ID['Base']
 
     generateGroundAndCropse(matrix, greenhouse.buildArea.y_min,greenhouse.buildArea.x_min, greenhouse.buildArea.x_max, greenhouse.buildArea.z_min, greenhouse.buildArea.z_max, foundation, ground)
     generateGlassDome(matrix, greenhouse.buildArea.y_min + 1, greenhouse.buildArea.y_min + GREENHOUSE_HEIGHT, greenhouse.buildArea.x_min, greenhouse.buildArea.x_max, greenhouse.buildArea.z_min, greenhouse.buildArea.z_max, used_glass)
@@ -62,16 +47,20 @@ def generateFront(matrix, h_min, h_max, x_min, x_max, z_min, z_max, used_glass):
                 addGlass(matrix, y, x, z_min, z_max, used_glass)
             elif x == x_min + 2 or x == x_max - 2 :
                 if y - h_min < 3 :
-                    addGlass(matrix, y, x, z_min, z_max, GLASS_ID)
+                    addGlassSinglePossibility(matrix, y, x, z_min, z_max, BlocksInfo.GLASS_ID)
                 elif y - h_min == 3 :
                     addGlass(matrix, y, x, z_min, z_max, used_glass)
             elif x > x_min + 2 and x < x_max - 2:
                 if y == h_max :
                     addGlass(matrix, y, x, z_min, z_max, used_glass)
                 elif y == h_max - 1 :
-                    addGlass(matrix, y, x, z_min, z_max, GLASS_ID)
+                    addGlassSinglePossibility(matrix, y, x, z_min, z_max, BlocksInfo.GLASS_ID)
 
 def addGlass(matrix, y, x, z_min, z_max, glass) :
+    matrix.setValue(y, x, z_min, glass[random.randint(0, len(glass) - 1)])
+    matrix.setValue(y, x, z_max, glass[random.randint(0, len(glass) - 1)])
+
+def addGlassSinglePossibility(matrix, y, x, z_min, z_max, glass) :
     matrix.setValue(y, x, z_min, glass)
     matrix.setValue(y, x, z_max, glass)
 
@@ -80,15 +69,15 @@ def generateGlassDome(matrix, h_min, h_max, x_min, x_max, z_min, z_max, used_gla
         for y in range(h_min, h_max+1):
             for z in range(z_min+1, z_max):
                 if y - h_min == 1 + (x - x_min) or y - h_min == 1 + (x_max - x) :
-                    matrix.setValue(y, x, z, used_glass)
+                    matrix.setValue(y, x, z, used_glass[random.randint(0, len(used_glass) - 1)])
                 elif (x == x_min or x == x_max) and y == h_min :
-                    matrix.setValue(y, x, z, used_glass)
+                    matrix.setValue(y, x, z, used_glass[random.randint(0, len(used_glass) - 1)])
                 elif x > x_min + 3 and x < x_max - 3 and y == h_max :
-                    matrix.setValue(y, x, z, used_glass)
+                    matrix.setValue(y, x, z, used_glass[random.randint(0, len(used_glass) - 1)])
 
 
 def generateGroundAndCropse(matrix, h_min, x_min, x_max, z_min, z_max, foundation, ground):
-    used_cropse = plants[RNG.randint(0, len(plants) - 1)]
+    used_cropse = BlocksInfo.CROPS_ID[RNG.randint(0, len(BlocksInfo.CROPS_ID) - 1)]
     for x in range(x_min, x_max+1):
         for z in range(z_min, z_max+1):
             if x == x_min or x == x_max :
@@ -97,15 +86,12 @@ def generateGroundAndCropse(matrix, h_min, x_min, x_max, z_min, z_max, foundatio
                 if (x > x_min and x < x_min + 2) or (x < x_max and x > x_max - 2) :
                     matrix.setValue(h_min, x, z, foundation)
                 elif x == x_min + 2 or x == x_max - 2 :
-                    matrix.setValue(h_min, x, z, SEA_LANTERN_ID)
+                    matrix.setValue(h_min, x, z, BlocksInfo.SEA_LANTERN_ID)
                 else :
                     matrix.setValue(h_min, x, z, ground)
             elif x == x_min + 1 or x == x_max - 1 :
                 if z == z_min + 3 or z == z_max - 3 :
-                    matrix.setValue(h_min, x, z, WATER_ID)
-                    #Put a dirt bloc under the water source and a trapdoor above
-                    matrix.setValue(h_min - 1, x, z, DIRT_ID)
-                    matrix.setValue(h_min + 1, x, z, TRAPDOOR_ID)
+                    addWaterSource(matrix, h_min, x, z, "W" if x == x_min + 1 else "E")
                 else :
                     addFarmlandAndCrops(matrix, h_min, x, z, used_cropse)
             elif x == x_min + 2 or x == x_max - 2 :
@@ -116,9 +102,21 @@ def generateGroundAndCropse(matrix, h_min, x_min, x_max, z_min, z_max, foundatio
                 addFarmlandAndCrops(matrix, h_min, x, z, used_cropse)
 
 def addFarmlandAndCrops(matrix, h, x, z, used_cropse) :
-    matrix.setValue(h, x, z, FARMLAND_ID)
+    matrix.setValue(h, x, z, BlocksInfo.FARMLAND_ID)
     matrix.setValue(h + 1, x, z, used_cropse)
 
+def addWaterSource(matrix, h, x, z, direction) :
+    matrix.setValue(h, x, z, BlocksInfo.WATER_ID)
+    #Put a dirt bloc under the water source and a trapdoor above
+    matrix.setValue(h - 1, x, z, BlocksInfo.DIRT_ID)
+    if direction == "E" :
+        matrix.setValue(h + 1, x, z, (BlocksInfo.TRAPDOOR_ID, 2))
+    elif direction == "W" :
+        matrix.setValue(h + 1, x, z, (BlocksInfo.TRAPDOOR_ID, 3))
+    elif direction == "S" :
+        matrix.setValue(h + 1, x, z, (BlocksInfo.TRAPDOOR_ID, 0))
+    else :
+        matrix.setValue(h + 1, x, z, (BlocksInfo.TRAPDOOR_ID, 1))
 
 def getGreenHouseAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max):
     remainder_x = x_max - x_min - GREENHOUSE_WIDTH

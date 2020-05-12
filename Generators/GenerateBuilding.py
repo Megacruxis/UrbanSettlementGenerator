@@ -166,7 +166,7 @@ def generateRoof(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, b
 	if floor % 2 == 0 :
 		x_max_local = x_min + (local_size - 1)
 		generateStreetLight(matrix, h_max, x_max - 1, z_max - 1)
-		generateBuildingWalls(matrix, h_max, h_max + local_size, floor_size, x_min, x_max_local, z_min_local, z_max, wall)
+		generateBuildingWalls(matrix, h_max + 1, h_max + local_size, floor_size, x_min, x_max_local, z_min_local, z_max, wall)
 		generateFloorsDivision(matrix, h_max + local_size, h_max + local_size, local_size, x_min, x_max_local, z_min_local, z_max, wall)
 		generateDoor(matrix, h_max + 1, x_min + 1, z_min_local, (197,9), (197,1))
 		generateDoor(matrix, h_max + 1, x_max_local, z_max -1, (197,8), (197,2))
@@ -178,7 +178,7 @@ def generateRoof(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, b
 	else :
 		x_min_local = x_max - (local_size - 1)
 		generateStreetLight(matrix, h_max, x_min + 1, z_max - 1)
-		generateBuildingWalls(matrix, h_max, h_max + local_size, floor_size, x_min_local, x_max, z_min_local, z_max, wall)
+		generateBuildingWalls(matrix, h_max + 1, h_max + local_size, floor_size, x_min_local, x_max, z_min_local, z_max, wall)
 		generateFloorsDivision(matrix, h_max + local_size, h_max + local_size, local_size, x_min_local, x_max, z_min_local, z_max, wall)
 		generateDoor(matrix, h_max + 1, x_max - 1, z_min_local, (197,9), (197,1))
 		generateDoor(matrix, h_max + 1, x_min_local, z_max - 1, (197,8), (197,0))
