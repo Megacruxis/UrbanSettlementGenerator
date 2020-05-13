@@ -41,6 +41,7 @@ def generateChandelier(world, y, x, z, fence_id, size=1):
 		world.setValue(y-i-1, x, z, (169,0))
 
 def generateStreetLight(matrix, y, x, z, size = 1):
+	i = 0
 	for i in range(1, size + 1):
 		matrix.setValue(y + i, x, z, (85,0))
 	else :
@@ -145,3 +146,9 @@ def generateAntenna(matrix, y_min, x, z) :
 				matrix.setValue(y, x, shifted_z, (101, 0))
 				matrix.setValue(y, x - 1, shifted_z, (101, 0))
 				matrix.setValue(y, x + 1, shifted_z, (101, 0))
+
+def generateBucket(matrix, y, x, z, rope_lenght = 1) :
+	for i in range(1, rope_lenght + 1) :
+		matrix.setValue(y - i, x, z, (85, 0))
+	else :
+		matrix.setEntity(y - i - 1, x, z, (118, 0), "cauldron")

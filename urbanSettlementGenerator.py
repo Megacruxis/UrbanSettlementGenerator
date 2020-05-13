@@ -9,6 +9,7 @@ from SpacePartitioning import binarySpacePartitioning, quadtreeSpacePartitioning
 import GenerateHouse
 import GenerateBuilding
 import GenerateGreenhouse
+import GenerateWell
 import BlocksInfo as BlocksInfo
 from Earthworks import prepareLot
 import GeneratePath
@@ -40,11 +41,13 @@ def perform(level, box, options):
 	(usable_wood, biome) = EnvironmentAnalyzer.determinate_usable_wood(level, wood_height_map, box.minx, box.maxx, box.minz, box.maxz)
 
 	# ===  City stats === #
+	biome_with_well = ['Desert', 'Badlands']
 	APARTMENT_SIZE = 2
 	HOUSE_SIZE = 4
 	GREENHOUSE_CAPACITY = 12
 	inhabitants = 0
 	greenhouse_count = 0
+	well_count = 0
 
 	# ==== PARTITIONING OF NEIGHBOURHOODS ====
 	(center, neighbourhoods) = generateCenterAndNeighbourhood(world_space, height_map)
@@ -177,7 +180,11 @@ def perform(level, box, options):
 			logging.info("\t{}".format(p))
 
 	for partition in final_partitioning:
-		if greenhouse_count * GREENHOUSE_CAPACITY < inhabitants :
+		if well_count == 0 and biome in biome_with_well :
+			well = generateWell(world, partition, height_map, biome)
+			well_count += 1
+			all_buildings.append(well)
+		elif greenhouse_count * GREENHOUSE_CAPACITY < inhabitants :
 			greenhouse = generateGreenhouse(world, partition, height_map, usable_wood, biome)
 			greenhouse_count += 1
 			all_buildings.append(greenhouse)
@@ -194,8 +201,7 @@ def perform(level, box, options):
 	logging.info("Calling MST on {} buildings".format(len(all_buildings)))
 	MST = utilityFunctions.getMST_Manhattan(all_buildings, pathMap, height_map)
 
-	pavementBlockID = 4
-	pavementBlockSubtype = 0
+	pavementBlockID = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
 	for m in MST:
 		p1 = m[1]
 		p2 = m[2]
@@ -204,10 +210,10 @@ def perform(level, box, options):
 	 	path = utilityFunctions.aStar(p1.entranceLot, p2.entranceLot, pathMap, height_map)
 	 	if path != None:
 	 		logging.info("Found path between {} and {}. Generating road...".format(p1.entranceLot, p2.entranceLot))
-		 	GeneratePath.generatPath(world, path, height_map, (pavementBlockID, pavementBlockSubtype))
+		 	GeneratePath.generatPath(world, path, height_map, pavementBlockID)
 		else:
 			logging.info("Couldnt find path between {} and {}. Generating a straight road between them...".format(p1.entranceLot, p2.entranceLot))
-	 		GeneratePath.generatPath_StraightLine(world, p1.entranceLot[1], p1.entranceLot[2], p2.entranceLot[1], p2.entranceLot[2], height_map, (pavementBlockID, pavementBlockSubtype))
+	 		GeneratePath.generatPath_StraightLine(world, p1.entranceLot[1], p1.entranceLot[2], p2.entranceLot[1], p2.entranceLot[2], height_map, pavementBlockID)
 
 	# ==== UPDATE WORLD ====
 	world.updateWorld()
@@ -234,6 +240,12 @@ def generateGreenhouse(matrix, p, height_map, usable_wood, biome):
 	greenhouse = GenerateGreenhouse.generateGreenhouse(matrix, h, p[1], p[2], p[3], p[4], p[5], usable_wood, biome)
 	utilityFunctions.updateHeightMap(height_map, p[2]+3, p[3]-3, p[4]+2, p[5]-2, -1)
 	return greenhouse
+
+def generateWell(matrix, p, height_map, biome):
+	h = prepareLot(matrix, p, height_map)
+	well = GenerateWell.generateWell(matrix, h, p[1], p[2], p[3], p[4], p[5], biome)
+	utilityFunctions.updateHeightMap(height_map, p[2] + 1, p[3] - 2, p[4] + 1, p[5]-2, -1)
+	return well
 
 def generateHouse(matrix, p, height_map, usable_wood, biome):
 	logging.info("Generating a house in lot {}".format(p))

@@ -30,6 +30,7 @@ Friday : -
 
 Week six (11/05/2020 - 17/05/2020) :
 Monday : The blocks used for the walls of the house, the pillars and the roof now depend on the environment. I also made some change to the roof design (replace the full blocks with stairs). This complete the adaptability of the house (see picture 22 to 24). 
-Thuesday : 
+Thuesday : I have completed the Greenhouses adaptability (see picture 25 to 27) which mean that all the current buildings have adaptability. I then begin working on the creation of a new building : the well (which will only spawn in dry areas like deserts). At the end of the day half of the well generation was programmed.
+Wednesday : I used my morning to complete the code which generate wells (so they are now generated during the creation of the city, see picture 28 and 29).  
 
-updated the 12/05/2020 
+updated the 13/05/2020 

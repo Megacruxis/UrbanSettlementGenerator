@@ -25,8 +25,8 @@ def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_
     greenhouse.orientation = getOrientation()
     greenhouse.entranceLot = ( greenhouse.lotArea.y_min + 1, greenhouse.buildArea.x_min + GREENHOUSE_WIDTH / 2, greenhouse.lotArea.z_min)
 
-    logging.info("Generating greenhouse at area {}".format(greenhouse.area))
-    logging.info("Construction area {}".format(greenhouse.constructionArea))
+    logging.info("Generating greenhouse at area {}".format(greenhouse.lotArea))
+    logging.info("Construction area {}".format(greenhouse.buildArea))
 
     foundation = BlocksInfo.GREENHOUSE_FUNDATION_ID[biome] if biome in BlocksInfo.GREENHOUSE_FUNDATION_ID.keys() else BlocksInfo.PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
     ground = BlocksInfo.GREENHOUSE_GROUND_ID[biome] if biome in BlocksInfo.GREENHOUSE_GROUND_ID.keys() else BlocksInfo.GREENHOUSE_GROUND_ID['Base']

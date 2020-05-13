@@ -2,10 +2,12 @@ CACTUS_ID = 81
 DOUBLE_PLANT = 175
 TRAPDOOR_ID = 96
 
-FARMLAND_ID = (60, 0)
+AIR_ID = (0, 0)
 DIRT_ID = (3, 0)
-GLASS_ID = (20, 0)
 WATER_ID = (9, 0)
+GLASS_ID = (20, 0)
+FARMLAND_ID = (60, 0)
+IRON_BAR_ID = (101, 0)
 SEA_LANTERN_ID = (169, 0)
 
 CROPS_ID = [(59, 0), (141, 0), (142, 0)]
@@ -16,6 +18,15 @@ WOOD_NAME = {'17:0': 'oak',
              '17:3': 'jungle',
              '162:0': 'acacia',
              '162:1': 'dark_oak'}
+
+PAVEMENT_ID = {'Base' : (1, 6),
+               'Desert' : (24, 0),
+               'Beach' : (5, 2),
+               'Badlands' : (179, 0),
+               'Mushroom_fields' : (159, 10),
+               'Mountains' : (1, 4),
+               'Swamp' : (4, 0),
+               'Jungle' : (208, 0)}
 
 WOOD_ID = {'oak': (17, 0),
            'spruce': (17, 1),
@@ -156,3 +167,6 @@ GREENHOUSE_FUNDATION_ID = {'Desert' : (24, 0),
                            'Badlands' : (179, 0),
                            'Mountains' : (4, 0),
                            'Swamp' : (48, 0)}
+
+WELL_WALL_ID = {'Desert' : (24, 2),
+                'Badlands' : (179, 2)}
