@@ -27,6 +27,7 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wo
 	wall = (159, random.randint(0,15))
 	ceiling = wall
 	floor = wall
+	pavement_block = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
 	(slab, stairs, fence, structureBloc) = selectBuildingBlocks(usable_wood, biome)
 
 	floor_size = 8
@@ -48,9 +49,9 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wo
 		generateDoor(matrix, h_min+1, door_x, door_z, (64,9), (64,3))
 		building.entranceLot = (h_min+1, door_x, building.area.z_max)
 		for z in range(door_z+1, building.area.z_max):
-			matrix.setValue(h_min,door_x,z, (4,0))
-			matrix.setValue(h_min,door_x-1,z, (4,0))
-			matrix.setValue(h_min,door_x+1,z, (4,0))
+			matrix.setValue(h_min,door_x,z, pavement_block)
+			matrix.setValue(h_min,door_x-1,z, pavement_block)
+			matrix.setValue(h_min,door_x+1,z, pavement_block)
 		# determine which floor have two apartment instead of one
 		double_apartment_floor = pickDoubleapartmentFloor(h_min, h_max, floor_size)
 		# apartment windows

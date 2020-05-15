@@ -30,6 +30,7 @@ def generateWell(matrix, h_min, h_max, x_min, x_max, z_min, z_max, biome) :
     structure_bloc = BlocksInfo.STRUCTURE_BLOCK_ID[biome]
     pillar = BlocksInfo.HOUSE_PILLAR_ID[wall]
     stairs = BlocksInfo.STAIRS_ID[biome][0]
+    pavement_block = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
 
     setGround(matrix, h_min - 1, x_min, x_max, z_min, z_max, structure_bloc)
     generateWall(matrix, h_min, x_min, x_max, z_min, z_max, wall, fence)
@@ -39,18 +40,41 @@ def generateWell(matrix, h_min, h_max, x_min, x_max, z_min, z_max, biome) :
         generateEntrance(matrix, h_min, x_min + WELL_ENTRANCE_SIZE, x_max - WELL_ENTRANCE_SIZE, z_min, z_min, wall)
         generateBucket(matrix, h_min + 4, x_min + (WELL_AREA_SIZE / 2), z_min + (WELL_AREA_SIZE / 2), 1)
         well.entranceLot = (well.lotArea.y_min + 1, well.buildArea.x_min + (WELL_AREA_SIZE / 2), well.lotArea.z_min)
+        door_x = x_min + WELL_ENTRANCE_SIZE
+        # entrance path
+        for z in range(well.lotArea.z_min, well.buildArea.z_min):
+            for i in range(1, WELL_ENTRANCE_SIZE - 1) :
+                matrix.setValue(well.lotArea.y_min, door_x + i, z, pavement_block)
+
     elif well.orientation == "S" :
         generateEntrance(matrix, h_min, x_min + WELL_ENTRANCE_SIZE, x_max - WELL_ENTRANCE_SIZE, z_max, z_max, wall)
         generateBucket(matrix, h_min + 4, x_max - (WELL_AREA_SIZE / 2), z_max - (WELL_AREA_SIZE / 2), 1)
         well.entranceLot = (well.lotArea.y_min + 1, well.buildArea.x_min + (WELL_AREA_SIZE / 2), well.lotArea.z_max)
+        door_x = x_min + WELL_ENTRANCE_SIZE
+        # entrance path
+        for z in range(well.buildArea.z_max + 1, well.lotArea.z_max):
+            for i in range(1, WELL_ENTRANCE_SIZE - 1) :
+                matrix.setValue(well.lotArea.y_min, door_x + i, z, pavement_block)
+
     elif well.orientation == "E" :
         generateEntrance(matrix, h_min, x_max, x_max, z_min + WELL_ENTRANCE_SIZE, z_max - WELL_ENTRANCE_SIZE, wall)
         generateBucket(matrix, h_min + 4, x_max - (WELL_AREA_SIZE / 2), z_min + (WELL_AREA_SIZE / 2), 1)
         well.entranceLot = (well.lotArea.y_min + 1, well.lotArea.x_max, well.buildArea.z_min + (WELL_AREA_SIZE / 2))
+        door_z = z_min + WELL_ENTRANCE_SIZE
+        # entrance path
+        for x in range(well.buildArea.x_max + 1, well.lotArea.x_max):
+            for i in range(1, WELL_ENTRANCE_SIZE - 1):
+                matrix.setValue(well.lotArea.y_min, x, door_z + i, pavement_block)
+
     else :
         generateEntrance(matrix, h_min, x_min, x_min, z_min + WELL_ENTRANCE_SIZE, z_max - WELL_ENTRANCE_SIZE, wall)
         generateBucket(matrix, h_min + 4, x_min + (WELL_AREA_SIZE / 2), z_max - (WELL_AREA_SIZE / 2), 1)
         well.entranceLot = (well.lotArea.y_min + 1, well.lotArea.x_min, well.buildArea.z_min + (WELL_AREA_SIZE / 2))
+        door_z = z_min + WELL_ENTRANCE_SIZE
+        # entrance path
+        for x in range(well.lotArea.x_min, well.buildArea.x_min):
+            for i in range(1, WELL_ENTRANCE_SIZE - 1) :
+                matrix.setValue(well.lotArea.y_min, x, door_z + i, pavement_block)
 
     return well
 

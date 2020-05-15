@@ -36,7 +36,7 @@ def perform(level, box, options):
 	height_map = utilityFunctions.getHeightMap(level,box, None, False)
 
 	# === Wood quantity and Biome analyzer === #
-	air_like = [0, 5, 6, 30, 37, 38, 39, 40, 59, 83, 85, 104, 105, 107, 141, 142, 175]
+	air_like = [0, 4, 5, 6, 20, 23, 29, 30, 35, 37, 38, 39, 40, 44, 46, 47, 50, 59, 66, 83, 85, 86, 95, 102, 104, 105, 107, 126, 141, 142, 160, 175]
 	wood_height_map = utilityFunctions.getHeightMap(level, box, air_like, True)
 	(usable_wood, biome) = EnvironmentAnalyzer.determinate_usable_wood(level, wood_height_map, box.minx, box.maxx, box.minz, box.maxz)
 
@@ -180,7 +180,7 @@ def perform(level, box, options):
 			logging.info("\t{}".format(p))
 
 	for partition in final_partitioning:
-		if well_count == 0 and biome in biome_with_well :
+		if well_count < 1 and biome in biome_with_well :
 			well = generateWell(world, partition, height_map, biome)
 			well_count += 1
 			all_buildings.append(well)
@@ -230,19 +230,19 @@ def generateCenterAndNeighbourhood(space, height_map):
 	return (center, neighbourhoods)
 
 def generateBuilding(matrix, p, height_map, usable_wood, biome):
-	h = prepareLot(matrix, p, height_map)
+	h = prepareLot(matrix, p, height_map, biome)
 	building = GenerateBuilding.generateBuilding(matrix, h, p[1],p[2],p[3], p[4], p[5], usable_wood, biome)
 	utilityFunctions.updateHeightMap(height_map, p[2]+1, p[3]-2, p[4]+1, p[5]-2, -1)
 	return building
 
 def generateGreenhouse(matrix, p, height_map, usable_wood, biome):
-	h = prepareLot(matrix, p, height_map)
+	h = prepareLot(matrix, p, height_map, biome)
 	greenhouse = GenerateGreenhouse.generateGreenhouse(matrix, h, p[1], p[2], p[3], p[4], p[5], usable_wood, biome)
 	utilityFunctions.updateHeightMap(height_map, p[2]+3, p[3]-3, p[4]+2, p[5]-2, -1)
 	return greenhouse
 
 def generateWell(matrix, p, height_map, biome):
-	h = prepareLot(matrix, p, height_map)
+	h = prepareLot(matrix, p, height_map, biome)
 	well = GenerateWell.generateWell(matrix, h, p[1], p[2], p[3], p[4], p[5], biome)
 	utilityFunctions.updateHeightMap(height_map, p[2] + 1, p[3] - 2, p[4] + 1, p[5]-2, -1)
 	return well
@@ -256,7 +256,7 @@ def generateHouse(matrix, p, height_map, usable_wood, biome):
 			line += str(height_map[x][z])+" "
 		logging.info(line)
 
-	h = prepareLot(matrix, p, height_map)
+	h = prepareLot(matrix, p, height_map, biome)
 
 	logging.info("Terrain after flattening: ")
 	for x in range (p[2], p[3]):

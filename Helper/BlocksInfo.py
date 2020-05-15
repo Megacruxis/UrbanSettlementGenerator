@@ -3,12 +3,17 @@ DOUBLE_PLANT = 175
 TRAPDOOR_ID = 96
 
 AIR_ID = (0, 0)
+GRASS_ID = (2, 0)
 DIRT_ID = (3, 0)
+PODZOL_ID = (3, 2)
 WATER_ID = (9, 0)
 GLASS_ID = (20, 0)
+SAND_ID = (12, 0)
+RED_SAND_ID = (12, 1)
 FARMLAND_ID = (60, 0)
 IRON_BAR_ID = (101, 0)
 SEA_LANTERN_ID = (169, 0)
+TERRACOTTA_ID = (172, 0)
 
 CROPS_ID = [(59, 0), (141, 0), (142, 0)]
 
@@ -22,11 +27,26 @@ WOOD_NAME = {'17:0': 'oak',
 PAVEMENT_ID = {'Base' : (1, 6),
                'Desert' : (24, 0),
                'Beach' : (5, 2),
-               'Badlands' : (179, 0),
+               'Badlands' : (159, 8), #159, 12
                'Mushroom_fields' : (159, 10),
                'Mountains' : (1, 4),
                'Swamp' : (4, 0),
                'Jungle' : (208, 0)}
+
+# with the id of the ground block you obtain the id of the corresponding underground block
+UNDERGROUND_BLOCK_ID = {(1, 0) : (1, 0),
+                        (2, 0) : (3, 0),
+                        (3, 0) : (3, 0),
+                        (3, 1) : (3, 1),
+                        (3, 2) : (3, 0),
+                        (12, 0) : (24, 0),
+                        (12, 1) : (172, 0),
+                        (13, 0) : (1, 0),
+                        (16, 0) : (1, 0),
+                        (79, 0) : (79, 0),
+                        (80, 0) : (80, 0),
+                        (82, 0) : (1, 0),
+                        (110, 0) : (3, 0)}
 
 WOOD_ID = {'oak': (17, 0),
            'spruce': (17, 1),

@@ -23,7 +23,9 @@ def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_
 
     greenhouse.buildArea = utilityFunctions.dotdict({"y_min": h_min, "y_max": h_max, "x_min": x_min, "x_max": x_max, "z_min": z_min, "z_max": z_max})
     greenhouse.orientation = getOrientation()
-    greenhouse.entranceLot = ( greenhouse.lotArea.y_min + 1, greenhouse.buildArea.x_min + GREENHOUSE_WIDTH / 2, greenhouse.lotArea.z_min)
+    door_z = greenhouse.buildArea.z_min
+    door_x = greenhouse.buildArea.x_min + GREENHOUSE_WIDTH / 2
+    greenhouse.entranceLot = ( greenhouse.lotArea.y_min + 1, door_x, greenhouse.lotArea.z_min)
 
     logging.info("Generating greenhouse at area {}".format(greenhouse.lotArea))
     logging.info("Construction area {}".format(greenhouse.buildArea))
@@ -31,10 +33,16 @@ def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_
     foundation = BlocksInfo.GREENHOUSE_FUNDATION_ID[biome] if biome in BlocksInfo.GREENHOUSE_FUNDATION_ID.keys() else BlocksInfo.PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
     ground = BlocksInfo.GREENHOUSE_GROUND_ID[biome] if biome in BlocksInfo.GREENHOUSE_GROUND_ID.keys() else BlocksInfo.GREENHOUSE_GROUND_ID['Base']
     used_glass = BlocksInfo.GREENHOUSE_GLASS_ID[biome] if biome in BlocksInfo.GREENHOUSE_GLASS_ID.keys() else BlocksInfo.GREENHOUSE_GLASS_ID['Base']
+    pavement_block = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
 
     generateGroundAndCropse(matrix, greenhouse.buildArea.y_min,greenhouse.buildArea.x_min, greenhouse.buildArea.x_max, greenhouse.buildArea.z_min, greenhouse.buildArea.z_max, foundation, ground)
     generateGlassDome(matrix, greenhouse.buildArea.y_min + 1, greenhouse.buildArea.y_min + GREENHOUSE_HEIGHT, greenhouse.buildArea.x_min, greenhouse.buildArea.x_max, greenhouse.buildArea.z_min, greenhouse.buildArea.z_max, used_glass)
     generateFront(matrix, greenhouse.buildArea.y_min + 1, greenhouse.buildArea.y_min + GREENHOUSE_HEIGHT, greenhouse.buildArea.x_min, greenhouse.buildArea.x_max, greenhouse.buildArea.z_min, greenhouse.buildArea.z_max, used_glass)
+
+    # entrance path
+    for z in range(greenhouse.lotArea.z_min, door_z):
+        matrix.setValue(h_min, door_x, z, pavement_block)
+        matrix.setValue(h_min, door_x - 1, z, pavement_block)
 
     return greenhouse
 

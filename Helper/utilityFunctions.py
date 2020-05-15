@@ -12,7 +12,7 @@ import BlocksInfo as BlocksInfo
 from copy import deepcopy
 import sys
 
-air_like = [0, 5, 6, 17, 18, 30, 31, 32, 37, 38, 39, 40, 59, 81, 83, 85, 104, 105, 106, 107, 111, 141, 142, 161, 162, 175, 78, 79, 99, 100]
+air_like = [0, 4, 5, 6, 17, 18, 20, 23, 26, 29, 30, 31, 32, 35, 37, 38, 39, 40, 44, 46, 47, 48, 50, 53, 54, 55, 58, 59, 60, 61, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 78, 81, 83, 85, 86, 93, 94, 95, 96, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 111, 117, 118, 126, 128, 131, 132, 134, 135, 136, 139, 140, 141, 142, 145, 146, 160, 161, 162, 163, 164, 170, 171, 175, 176, 177, 180, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 207]
 ground_like = [1, 2, 3]
 water_like = [8, 9, 10, 11]
 
@@ -449,10 +449,11 @@ def getHeightCounts(matrix, min_x, max_x, min_z, max_z):
 	for x in range(min_x, max_x+1):
 		for z in range(min_z, max_z+1):
 			value = matrix[x][z]
-			if value not in flood_values.keys():
-				flood_values[value] = 1
-			else:
-				flood_values[value] += 1
+			if not value == -1 :
+				if value not in flood_values.keys():
+					flood_values[value] = 1
+				else:
+					flood_values[value] += 1
 	return flood_values
 
 def getMostOcurredGroundBlock(matrix, height_map, min_x, max_x, min_z, max_z):
@@ -460,18 +461,29 @@ def getMostOcurredGroundBlock(matrix, height_map, min_x, max_x, min_z, max_z):
 	for x in range(min_x, max_x+1):
 		for z in range(min_z, max_z+1):
 			groundBlock = matrix.getValue(height_map[x][z], x, z)
-			if type(groundBlock) == tuple:
-				groundBlock = groundBlock[0]
+			if not type(groundBlock) == tuple:
+				groundBlock = (groundBlock, 0)
+			else :
+				groundBlock = (groundBlock[0], 0)
 			if groundBlock not in block_values.keys():
-				block_values[groundBlock] = 1
+				if groundBlock == (179, 0) :
+					block_values[BlocksInfo.RED_SAND_ID] = block_values[BlocksInfo.RED_SAND_ID] + 1 if BlocksInfo.RED_SAND_ID in block_values.keys() else  1
+				elif groundBlock == (24, 0) :
+					block_values[BlocksInfo.SAND_ID] = block_values[BlocksInfo.SAND_ID] + 1 if BlocksInfo.SAND_ID in block_values.keys() else 1
+				elif groundBlock == (159, 0) :
+					block_values[BlocksInfo.TERRACOTTA_ID] = block_values[BlocksInfo.TERRACOTTA_ID] + 1 if BlocksInfo.TERRACOTTA_ID in block_values.keys() else 1
+				else :
+					block_values[groundBlock] = 1
 			else:
 				block_values[groundBlock] += 1
-	for key in sorted(block_values, key=block_values.get):
-		if key not in air_like:
-			return (key, 0)
-
-	grass_block = (2,0)
-	return grass_block
+	selected_key = BlocksInfo.GRASS_ID
+	max_value = 0
+	for key in block_values.keys():
+		tmp_value = block_values[key]
+		if  tmp_value > max_value :
+			max_value = tmp_value
+			selected_key = key
+	return selected_key
 
 
 # receives a list of areas in the format (x_min, x_max, z_min, z_max)

@@ -10,13 +10,12 @@ GROUND_ID = [1, 2, 3, 12, 13, 16, 79, 80, 82, 110, 159, 174]
 PLANT_ID = [31, 32, 81, 78, 99, 100, 106, 111, 127]
 NO_SUB_ID = [99, 100, 106] #block with useless sub_id info
 FLUID_ID = [9]
-AIR_ID = [0, 18, 161, 6, 37, 38, 39, 40, 83, 175]
 
 found_wood = {'17:0': 0, '17:1': 0, '17:2': 0, '17:3': 0, '162:0': 0, '162:1': 0}
 found_blocks = {}
 found_plants = {}
 
-BADLANDS_TERRACOTTA_ID = ['159:0', '159:1', '159:4', '159:0', '159:12', '159:14']
+BADLANDS_TERRACOTTA_ID = ['159:0', '159:1', '159:4', '159:8', '159:12', '159:14', '172:0']
 MYCELIUM_ID = '110:0'
 LILY_PAD_ID = '111:0'
 SAND_ID = '12:0'
@@ -43,7 +42,7 @@ def determinate_usable_wood(level, height_map, x_min, x_max, z_min, z_max) :
         for x in range(x_min, x_max):
             y = height_map[x - x_min][z - z_min]
             block = level.blockAt(x, y, z)
-            while block in WOOD_ID or (block in AIR_ID and y > 0) or block in PLANT_ID :
+            while not block in GROUND_ID :
                 if block in WOOD_ID :
                     sub_id = level.blockDataAt(x, y, z)
                     if (block == 17 and sub_id > 3) or (block == 162 and sub_id > 1) :
@@ -69,7 +68,7 @@ def determinate_usable_wood(level, height_map, x_min, x_max, z_min, z_max) :
     logging.info("---------------------------------------------")
     logging.info("found wood : oak : {}, spruce {}, birch {}, jungle {}, acacia {}, dark_oak {}".format(found_wood['17:0'], found_wood['17:1'], found_wood['17:2'], found_wood['17:3'], found_wood['162:0'], found_wood['162:1']))
     logging.info("---------------------------------------------")
-    logging.info("block trouves : {}".format(found_blocks))
+    logging.info("block found : {}".format(found_blocks))
     logging.info("---------------------------------------------")
     logging.info("plantes trouves : {}".format(found_plants))
     logging.info("---------------------------------------------")
@@ -82,6 +81,7 @@ def determinate_usable_wood(level, height_map, x_min, x_max, z_min, z_max) :
     else :
         """ Todo add a behavior if no wood """
         usable_wood['17:0'] = 100
+
     biome = identifyBiome(total_ground, total_water, total_found)
 
     logging.info("usable wood = {}".format(usable_wood))
