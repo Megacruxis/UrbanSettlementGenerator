@@ -33,5 +33,20 @@ Monday : The blocks used for the walls of the house, the pillars and the roof no
 Thuesday : I have completed the Greenhouses adaptability (see picture 25 to 27) which mean that all the current buildings have adaptability. I then begin working on the creation of a new building : the well (which will only spawn in dry areas like deserts). At the end of the day half of the well generation was programmed.
 Wednesday : I used my morning to complete the code which generate wells (so they are now generated during the creation of the city, see picture 28 and 29). I Then added adaptability on the path creation (the block used to create the path depend on the biome) and begin to work on some improvements for the function which flatt the lots.    
 Thursday : Flattening the lot is way harder than I expected. Even after spending the day experimenting, I still haven't found a consistent way to flatten lots properly.
+Friday : After a quick talk with Eduardo I implemented a new way of flattening the lots (using random area selected the same way as lot but with less constraint). This method is not perfect and have some problem so it still needs some change. During the afternoon I was stress by a half cut tree, so I decide to code the cleaning of the tree earlier than planned in my planning. At the end of the day my function which clean tree was not working.
 
-updated the 15/05/2020 
+Week seven (18/05/2020 - 24/05/2020) :
+Monday : I continued my work on the elimination of the trees with a new idea. Spent the whole day programming it and it's not finished. Currently, it deletes all the trees with a trunk inside a lot but it's not able to clean trees who have only some of their leaf in the plots.
+Thuesday : I finally finish a first version of a working function which clean tree properly. The process is the following : Before doing any earthwork, all the tree in the modified area are saved (in an array containing all the block of the trees). After the earthwork all the tree are place again in the area and if the area is in a lower position than before the flattening all the tree which have block outside the area are deleted (we don't place them back). When cleaning the area before building we only delete the tree with trunk inside the building area or those who have leaf inside the building area. The current version of the function is not able to delete Acacia tree and have some problem with big oak tree (those with a 2×2 blocks trunk)and dark oak tree.
+Wednesday : I begin to program the deletion of the "special" tree and clean the code of the first version. The function is now able to delete and delete properly the Acacia tree and the Jungle tree.
+Thursday : I add the case of the oak tree and the dark oak tree which mean that the function is now able to handle all type of tree. Since I still have not test all the case the function could have some bug but it should be working. I also have to redo my function which locate the trunk of a tree from one of its leave blocks. The second version of the tree deletion is almost ready (still need some test and one more special function).
+Friday : I have begun the long process of testing my tree deletion. I found some bugs that I corrected during the morning. The deletion of the oak tree is not working properly when he is adjacent to other oak tree, so I spent the rest of the day trying to solve this issue. I have come to the conclusion that the most optimal way is to delete all the adjacent trees even if it's not what I originally wanted (since I want to keep as many trees as possible in order to have some kind of "green" city). I will change my function in the upcoming days.
+
+Week height (25/05/2020 - 31/05/2020) :
+Monday :
+Thuesday :
+Wednesday :
+thursday :
+Friday :
+
+updated the 25/05/2020 
