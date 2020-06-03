@@ -1,28 +1,51 @@
 CACTUS_ID = 81
-DOUBLE_PLANT = 175
 TRAPDOOR_ID = 96
+BROWN_MUSHROOM_ID = 99
+RED_MUSHROOM_ID = 100
+VINES_ID = 106
+COCOA_ID = 127
+DOUBLE_PLANT = 175
+LOGS_ID = [17, 162]
+LEAVES_ID = [18, 161]
 
 AIR_ID = (0, 0)
+STONE_ID = (1, 0)
 GRASS_ID = (2, 0)
 DIRT_ID = (3, 0)
 PODZOL_ID = (3, 2)
 WATER_ID = (9, 0)
-GLASS_ID = (20, 0)
 SAND_ID = (12, 0)
 RED_SAND_ID = (12, 1)
+GRAVEL_ID = (13, 0)
+COAL_ORE_ID = (16, 0)
+GLASS_ID = (20, 0)
+DEAD_BUSH_ID = (31, 0)
 FARMLAND_ID = (60, 0)
+SNOW_ID = (78, 0)
+ICE_ID = (79, 0)
 IRON_BAR_ID = (101, 0)
+MYCELIUM_ID = (110, 0)
+LILY_PAD_ID = (111, 0)
+ACACIA_LOG = (162, 0)
 SEA_LANTERN_ID = (169, 0)
 TERRACOTTA_ID = (172, 0)
 
 CROPS_ID = [(59, 0), (141, 0), (142, 0)]
+BADLANDS_TERRACOTTA_ID = [(159, 0), (159, 1), (159, 4), (159, 8), (159, 12), (159, 14), (172, 0)]
 
-WOOD_NAME = {'17:0': 'oak',
-             '17:1': 'spruce',
-             '17:2': 'birch',
-             '17:3': 'jungle',
-             '162:0': 'acacia',
-             '162:1': 'dark_oak'}
+WOOD_NAME = {(17, 0) : 'oak',
+             (17, 1) : 'spruce',
+             (17, 2) : 'birch',
+             (17, 3) : 'jungle',
+             (162, 0) : 'acacia',
+             (162, 1) : 'dark_oak'}
+
+LEAVES_TO_LOGS = {(18, 0) : (17, 0),
+                  (18, 1) : (17, 1),
+                  (18, 2) : (17, 2),
+                  (18, 3) : (17, 3),
+                  (161, 0) : (162, 0),
+                  (161, 1) : (162, 1)}
 
 PAVEMENT_ID = {'Base' : (1, 6),
                'Desert' : (24, 0),

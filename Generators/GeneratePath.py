@@ -1,6 +1,8 @@
 import logging
+import utilityFunctions
+import BlocksInfo as BlocksInfo
 
-air_like = [0, 6, 17, 18, 30, 31, 32, 37, 38, 39, 40, 59, 81, 83, 85, 104, 105, 106, 107, 111, 141, 142, 161, 162, 175, 78, 79, 99]
+air_like = [0, 2, 3, 6, 17, 18, 30, 31, 32, 37, 38, 39, 40, 59, 81, 83, 85, 104, 105, 106, 107, 111, 141, 142, 161, 162, 175, 78, 79, 99]
 ground_like = [1, 2, 3]
 water_like = [8, 9, 10, 11]
 
@@ -45,8 +47,13 @@ def generatPath(matrix, path, height_map, pavementBlock = (4,0), baseBlock=(2,0)
 		if up_to < 0 or y >= matrix.height: return
 		block = matrix.getValue(y, x, z)
 		if type(block) == tuple: block = block[0]
+		if block in BlocksInfo.LOGS_ID :
+			(x_min_tree, x_max_tree, z_min_tree, z_max_tree) = utilityFunctions.locateWholeTrunk(matrix, y, x, z)
+			utilityFunctions.deleteTree(matrix, y, x_min_tree, x_max_tree, z_min_tree, z_max_tree)
+		elif block in BlocksInfo.LEAVES_ID :
+			utilityFunctions.locateAndDeleteTreeFromLeaves(matrix, y, x, z)
 		if block in air_like:
-			matrix.setValue(y,x,z, (0,0))
+			matrix.setValue(y,x,z, BlocksInfo.AIR_ID)
 		fillAbove(matrix, y+1, x, z, up_to-1)
 
 	# logging.info("Path before:")

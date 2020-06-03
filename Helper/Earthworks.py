@@ -21,7 +21,7 @@ def prepareLot(matrix, p, height_map, biome):
 		# update the ground with the grass block
 		for x in range(x_min, x_max):
 			for z in range(z_min,z_max):
-				matrix.setValue(terrain_height, x, z, (2,0))
+				matrix.setValue(terrain_height, x, z, ground)
 		h = matrix.getMatrixY(terrain_height)
 
 
@@ -29,11 +29,15 @@ def prepareLot(matrix, p, height_map, biome):
 
 	return h
 
+def prepareArea(matrix, p, height_map, biome):
+	terrain_height = flattenPartition(matrix, p[2],p[3], p[4], p[5], height_map, biome, 6)
+	logging.info("Terrain was flattened at height {}".format(terrain_height))
+	utilityFunctions.updateHeightMap(height_map, p[2], p[3], p[4], p[5], terrain_height)
+
 # Given the map matrix, a partition (x_min, x_max, z_min, z_max) and a
 # height_map, perform earthworks on this lot by the flattening
 # returns the height in which construction should start
-def flattenPartition(matrix, x_min, x_max, z_min, z_max, height_map, biome):
-	shifting = 15
+def flattenPartition(matrix, x_min, x_max, z_min, z_max, height_map, biome, shifting = 12):
 	x_min_height_count = x_min - shifting if x_min - shifting >= 0 else 0
 	x_max_height_count = x_max + shifting if x_max + shifting < matrix.width else matrix.width - 1
 	z_min_height_count = z_min - shifting if z_min - shifting >= 0 else 0
@@ -61,9 +65,11 @@ def flattenPartition(matrix, x_min, x_max, z_min, z_max, height_map, biome):
 		 #Temporary need change
 		 underground_block = BlocksInfo.TERRACOTTA_ID
 	else :
-		underground_block = BlocksInfo.UNDERGROUND_BLOCK_ID[base_block] if base_block in BlocksInfo.UNDERGROUND_BLOCK_ID.keys() else (1, 0)
+		underground_block = BlocksInfo.UNDERGROUND_BLOCK_ID[base_block] if base_block in BlocksInfo.UNDERGROUND_BLOCK_ID.keys() else BlocksInfo.STONE_ID
 	logging.info("Most occurred ground block: {}".format(base_block))
 	logging.info("Flattening at height {}".format(average_height))
+
+	saved_trees = utilityFunctions.saveTreesInArea(matrix, height_map, average_height, x_min, x_max, z_min, z_max)
 
 	for x in range(x_min, x_max):
 		for z in range(z_min,z_max):
@@ -85,14 +91,14 @@ def flattenPartition(matrix, x_min, x_max, z_min, z_max, height_map, biome):
 						matrix.setValue(y,x,z, underground_block)
 					matrix.setValue(desired_matrix_height, x, z, base_block)
 				else:
-					#update every block between top height and the desired height
-					# when bringing the ground to a lower level, this will have the
-					# effect of e.g. erasing trees that were on top of that block
-					# this may cause some things to be unproperly erased
-					# (e.g. a branch of a tree coming from an nearby block)
-					# but this is probably the best/less complex solution for this
 					for y in range(matrix.height-1, desired_matrix_height, -1):
-						matrix.setValue(y,x,z, 0)
+						value = utilityFunctions.getBlockAndBlockData(matrix, y, x, z)
+						if type(value) == tuple :
+							value = value[0]
+						if not value in BlocksInfo.LEAVES_ID :
+							matrix.setValue(y, x, z, BlocksInfo.AIR_ID)
 					matrix.setValue(desired_matrix_height,x,z, base_block)
+
+	utilityFunctions.repositionateTrees(matrix, saved_trees, average_height, x_min, x_max, z_min, z_max)
 
 	return average_height

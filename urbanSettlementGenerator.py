@@ -11,7 +11,7 @@ import GenerateBuilding
 import GenerateGreenhouse
 import GenerateWell
 import BlocksInfo as BlocksInfo
-from Earthworks import prepareLot
+from Earthworks import prepareLot, prepareArea
 import GeneratePath
 import EnvironmentAnalyzer
 
@@ -44,10 +44,14 @@ def perform(level, box, options):
 	biome_with_well = ['Desert', 'Badlands']
 	APARTMENT_SIZE = 2
 	HOUSE_SIZE = 4
-	GREENHOUSE_CAPACITY = 12
+	GREENHOUSE_CAPACITY = 15
 	inhabitants = 0
 	greenhouse_count = 0
 	well_count = 0
+
+	# ==== PARTITIONING OF THE SELECTION IN AREA IN ORDER TO FLATTEN ====
+	earthwork_height_map = utilityFunctions.getHeightMap(level,box, None, True)
+	#area_partitioning_and_flattening(world_space, earthwork_height_map, world, biome)
 
 	# ==== PARTITIONING OF NEIGHBOURHOODS ====
 	(center, neighbourhoods) = generateCenterAndNeighbourhood(world_space, height_map)
@@ -217,6 +221,62 @@ def perform(level, box, options):
 
 	# ==== UPDATE WORLD ====
 	world.updateWorld()
+
+def area_partitioning_and_flattening(space, height_map, matrix, biome):
+	minimum_h = 10
+	minimum_w = 40
+	mininum_d = 40
+
+	iterate = 100
+	maximum_tries = 50
+	current_try = 0
+	minimum_lots = 100 #origin = 20
+	available_lots = 0
+	threshold = 10
+	partitioning_list = []
+	final_partitioning = []
+
+	while available_lots < minimum_lots and current_try < maximum_tries:
+		partitioning_list = []
+		for i in range(iterate):
+
+			# generate a partitioning through some algorithm
+			if RNG.random() < 0.5:
+				partitioning = binarySpacePartitioning(space.y_min, space.y_max, space.x_min, space.x_max, space.z_min, space.z_max, [])
+			else:
+				partitioning = quadtreeSpacePartitioning(space.y_min, space.y_max, space.x_min, space.x_max, space.z_min, space.z_max, [])
+
+			# remove invalid partitions from the partitioning
+			valid_partitioning = []
+			for p in partitioning:
+				(y_min, y_max, x_min, x_max, z_min, z_max) = (p[0], p[1], p[2],p[3], p[4], p[5])
+				failed_conditions = []
+				#cond2 = utilityFunctions.hasMinimumSize(y_min, y_max, x_min, x_max,z_min,z_max, minimum_h, minimum_w, mininum_d)
+				#if cond2 == False: failed_conditions.append(2)
+				cond3 = utilityFunctions.hasAcceptableSteepness(x_min, x_max,z_min,z_max, height_map, utilityFunctions.getScoreArea_type1, threshold)
+				if cond3 == False: failed_conditions.append(3)
+				if cond3:
+					heightCounts = utilityFunctions.getHeightCounts(height_map, x_min, x_max, z_min, z_max)
+					score =  max(heightCounts, key=heightCounts.get)
+					valid_partitioning.append((score, p))
+				else:
+					logging.info("Failed Conditions {}".format(failed_conditions))
+
+			partitioning_list.extend(valid_partitioning)
+			logging.info("Generated a partition with {} valid area and {} invalids ones".format(len(valid_partitioning), len(partitioning)-len(valid_partitioning)))
+
+		# order partitions by steepness
+		partitioning_list = sorted(partitioning_list)
+		final_partitioning = utilityFunctions.fusionIntersectingPartitions(partitioning_list, height_map)
+
+		available_lots = len(final_partitioning)
+		logging.info("Current partitioning with most available_lots: {}, current threshold {}".format(available_lots, threshold))
+
+		threshold = threshold + 1 if threshold < 20 else 20
+		current_try += 1
+
+	for partition in final_partitioning :
+		prepareArea(matrix, partition, height_map, biome)
 
 def generateCenterAndNeighbourhood(space, height_map):
 	neighbourhoods = []

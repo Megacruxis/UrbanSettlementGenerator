@@ -16,13 +16,12 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wo
 
 	building.area = utilityFunctions.dotdict({"y_min": h_min, "y_max": h_max, "x_min": x_min, "x_max": x_max, "z_min": z_min, "z_max": z_max})
 
-	utilityFunctions.cleanProperty(matrix, h_min+1, h_max, x_min, x_max, z_min, z_max)
-
 	(h_min, h_max, x_min, x_max, z_min, z_max) = getBuildingAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max)
 	building.constructionArea = (h_min, h_max, x_min, x_max, z_min, z_max)
 
-	logging.info("Generating house at area {}".format(building.area))
+	logging.info("Generating building at area {}".format(building.area))
 	logging.info("Construction area {}".format(building.constructionArea))
+	utilityFunctions.cleanProperty2(matrix, building.area.y_min + 1, building.area.y_max, x_min - 1, x_max + 1, z_min - 3 if z_min - 3 > building.area.z_min else building.area.z_min, z_max + 1)
 
 	wall = (159, random.randint(0,15))
 	ceiling = wall
@@ -38,14 +37,14 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wo
 	while (h_max-h_min) % floor_size != 0:
 		h_max -= 1
 
-	generateBuildingWalls(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall)
-	generateFloorsDivision(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall)
-
 	building.orientation = getOrientation()
 
 	if building.orientation == "S":
 		door_x = RNG.randint(x_min+1, x_max-1)
 		door_z = z_max
+		utilityFunctions.cleanProperty2(matrix, h_min + 1, h_max, door_x - 1, door_x + 1, z_max + 1, building.area.z_max - 1)
+		generateBuildingWalls(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall)
+		generateFloorsDivision(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, wall)
 		generateDoor(matrix, h_min+1, door_x, door_z, (64,9), (64,3))
 		building.entranceLot = (h_min+1, door_x, building.area.z_max)
 		for z in range(door_z+1, building.area.z_max):

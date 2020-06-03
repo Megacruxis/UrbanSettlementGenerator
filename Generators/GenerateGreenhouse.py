@@ -17,8 +17,6 @@ def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_
     greenhouse.type = "greenhouse"
     greenhouse.lotArea = utilityFunctions.dotdict({"y_min": h_min, "y_max": h_max, "x_min": x_min, "x_max": x_max, "z_min": z_min, "z_max": z_max})
 
-    utilityFunctions.cleanProperty(matrix, h_min+1, h_max, x_min, x_max, z_min, z_max)
-
     (h_min, h_max, x_min, x_max, z_min, z_max) = getGreenHouseAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max)
 
     greenhouse.buildArea = utilityFunctions.dotdict({"y_min": h_min, "y_max": h_max, "x_min": x_min, "x_max": x_max, "z_min": z_min, "z_max": z_max})
@@ -29,6 +27,8 @@ def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_
 
     logging.info("Generating greenhouse at area {}".format(greenhouse.lotArea))
     logging.info("Construction area {}".format(greenhouse.buildArea))
+    utilityFunctions.cleanProperty2(matrix, greenhouse.lotArea.y_min + 1, greenhouse.lotArea.y_max, x_min - 1, x_max + 1, z_min - 1, z_max + 1)
+    utilityFunctions.cleanProperty2(matrix, h_min + 1, h_max, door_x - 1, door_x + 1, greenhouse.lotArea.z_min + 1, z_min - 1)
 
     foundation = BlocksInfo.GREENHOUSE_FUNDATION_ID[biome] if biome in BlocksInfo.GREENHOUSE_FUNDATION_ID.keys() else BlocksInfo.PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
     ground = BlocksInfo.GREENHOUSE_GROUND_ID[biome] if biome in BlocksInfo.GREENHOUSE_GROUND_ID.keys() else BlocksInfo.GREENHOUSE_GROUND_ID['Base']

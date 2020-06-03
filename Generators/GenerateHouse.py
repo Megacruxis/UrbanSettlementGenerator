@@ -14,7 +14,6 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, biome, usabl
 	house.type = "house"
 	house.lotArea = utilityFunctions.dotdict({"y_min": h_min, "y_max": h_max, "x_min": x_min, "x_max": x_max, "z_min": z_min, "z_max": z_max})
 
-	utilityFunctions.cleanProperty(matrix, h_min+1, h_max, x_min, x_max, z_min, z_max)
 	#generateFence(matrix, h_min, x_min, x_max, z_min, z_max)
 
 	(h_min, h_max, x_min, x_max, z_min, z_max) = getHouseAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max)
@@ -25,6 +24,7 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, biome, usabl
 
 	logging.info("Generating house at area {}".format(house.lotArea))
 	logging.info("Construction area {}".format(house.buildArea))
+	utilityFunctions.cleanProperty2(matrix, house.lotArea.y_min + 1, house.lotArea.y_max, x_min - 1, x_max + 1, z_min - 1, z_max + 1)
 
 	picked_wood = utilityFunctions.selectRandomWood(usable_wood)
 	floor = BlocksInfo.HOUSE_FLOOR_ID[biome] if biome in BlocksInfo.HOUSE_FLOOR_ID.keys() else BlocksInfo.HOUSE_FLOOR_ID[picked_wood]
@@ -33,10 +33,7 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, biome, usabl
 	pillar = BlocksInfo.HOUSE_PILLAR_ID[wall] if wall in BlocksInfo.HOUSE_PILLAR_ID.keys() else BlocksInfo.WOOD_ID[picked_wood]
 	ceiling = BlocksInfo.STAIRS_ID[biome] if biome in BlocksInfo.STAIRS_ID.keys() else BlocksInfo.STAIRS_ID[picked_wood]
 	roof = BlocksInfo.STRUCTURE_BLOCK_ID[biome] if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else BlocksInfo.PLANKS_ID[picked_wood]
-
-	# generate walls from x_min+1, x_max-1, etc to leave space for the roof
-	generateWalls(matrix, house.buildArea.y_min, house.buildArea.y_max, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, wall, pillar)
-	generateFloor(matrix, house.buildArea.y_min, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, floor)
+	pavement_block = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
 
 	house.orientation = getOrientation(matrix, house.lotArea)
 	window_y = house.buildArea.y_min + 3
@@ -45,46 +42,62 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, biome, usabl
 	if house.orientation == "N":
 		door_x = RNG.randint(house.buildArea.x_min+4, house.buildArea.x_max-4)
 		door_z = house.buildArea.z_min
+		utilityFunctions.cleanProperty2(matrix, h_min + 1, h_max, door_x - 1, door_x + 1, house.lotArea.z_min + 1, z_min - 1)
+		# generate walls from x_min+1, x_max-1, etc to leave space for the roof
+		generateWalls(matrix, house.buildArea.y_min, house.buildArea.y_max, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, wall, pillar)
+		generateFloor(matrix, house.buildArea.y_min, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, floor)
 		generateDoor(matrix, door_y, door_x, door_z, (64,9), (64,1))
 		house.entranceLot = (h_min+1, door_x, house.lotArea.z_min)
 		# entrance path
 		for z in range(house.lotArea.z_min, door_z):
-			matrix.setValue(h_min,door_x,z, (4,0))
-			matrix.setValue(h_min,door_x-1,z, (4,0))
-			matrix.setValue(h_min,door_x+1,z, (4,0))
+			matrix.setValue(h_min,door_x,z, pavement_block)
+			matrix.setValue(h_min,door_x-1,z, pavement_block)
+			matrix.setValue(h_min,door_x+1,z, pavement_block)
 
 	elif house.orientation == "S":
 		door_x = RNG.randint(house.buildArea.x_min+4, house.buildArea.x_max-4)
 		door_z = house.buildArea.z_max
+		utilityFunctions.cleanProperty2(matrix, h_min + 1, h_max, door_x - 1, door_x + 1, z_max + 1, house.lotArea.z_max - 1)
+		# generate walls from x_min+1, x_max-1, etc to leave space for the roof
+		generateWalls(matrix, house.buildArea.y_min, house.buildArea.y_max, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, wall, pillar)
+		generateFloor(matrix, house.buildArea.y_min, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, floor)
 		generateDoor(matrix, door_y, door_x, door_z, (64,9), (64,3))
 		house.entranceLot = (h_min+1, door_x, house.lotArea.z_max)
 		# entrance path
 		for z in range(door_z+1, house.lotArea.z_max):
-			matrix.setValue(h_min,door_x,z, (4,0))
-			matrix.setValue(h_min,door_x-1,z, (4,0))
-			matrix.setValue(h_min,door_x+1,z, (4,0))
+			matrix.setValue(h_min,door_x,z, pavement_block)
+			matrix.setValue(h_min,door_x-1,z, pavement_block)
+			matrix.setValue(h_min,door_x+1,z, pavement_block)
 
 	elif house.orientation == "W":
 		door_x = house.buildArea.x_min
 		door_z = RNG.randint(house.buildArea.z_min+4, house.buildArea.z_max-4)
+		utilityFunctions.cleanProperty2(matrix, h_min + 1, h_max, house.lotArea.x_min + 1, x_min - 1, door_z - 1, door_z + 1)
+		# generate walls from x_min+1, x_max-1, etc to leave space for the roof
+		generateWalls(matrix, house.buildArea.y_min, house.buildArea.y_max, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, wall, pillar)
+		generateFloor(matrix, house.buildArea.y_min, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, floor)
 		generateDoor(matrix, door_y, door_x, door_z, (64,8), (64,0))
 		house.entranceLot = (h_min+1, house.lotArea.x_min, door_z)
 		# entrance path
 		for x in range(house.lotArea.x_min, door_x):
-			matrix.setValue(h_min,x,door_z, (4,0))
-			matrix.setValue(h_min,x,door_z-1, (4,0))
-			matrix.setValue(h_min,x,door_z+1, (4,0))
+			matrix.setValue(h_min,x,door_z, pavement_block)
+			matrix.setValue(h_min,x,door_z-1, pavement_block)
+			matrix.setValue(h_min,x,door_z+1, pavement_block)
 
 	elif house.orientation == "E":
 		door_x = house.buildArea.x_max
 		door_z = RNG.randint(house.buildArea.z_min+4, house.buildArea.z_max-4)
+		utilityFunctions.cleanProperty2(matrix, h_min + 1, h_max, x_max + 1, house.lotArea.x_max - 1, door_z - 1, door_z + 1)
+		# generate walls from x_min+1, x_max-1, etc to leave space for the roof
+		generateWalls(matrix, house.buildArea.y_min, house.buildArea.y_max, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, wall, pillar)
+		generateFloor(matrix, house.buildArea.y_min, house.buildArea.x_min, house.buildArea.x_max, house.buildArea.z_min, house.buildArea.z_max, floor)
 		generateDoor(matrix, door_y, door_x, door_z, (64,9), (64,2))
 		house.entranceLot = (h_min+1, house.lotArea.x_max, door_z)
 		# entrance path
 		for x in range(door_x+1, house.lotArea.x_max+1):
-			matrix.setValue(h_min,x,door_z, (4,0))
-			matrix.setValue(h_min,x,door_z-1, (4,0))
-			matrix.setValue(h_min,x,door_z+1, (4,0))
+			matrix.setValue(h_min,x,door_z, pavement_block)
+			matrix.setValue(h_min,x,door_z-1, pavement_block)
+			matrix.setValue(h_min,x,door_z+1, pavement_block)
 
 	if house.orientation == "N" or house.orientation == "S":
 		generateWindow_alongX(matrix, window_y, house.buildArea.x_min, house.buildArea.z_min, house.buildArea.z_max)

@@ -43,10 +43,17 @@ Thursday : I add the case of the oak tree and the dark oak tree which mean that 
 Friday : I have begun the long process of testing my tree deletion. I found some bugs that I corrected during the morning. The deletion of the oak tree is not working properly when he is adjacent to other oak tree, so I spent the rest of the day trying to solve this issue. I have come to the conclusion that the most optimal way is to delete all the adjacent trees even if it's not what I originally wanted (since I want to keep as many trees as possible in order to have some kind of "green" city). I will change my function in the upcoming days.
 
 Week height (25/05/2020 - 31/05/2020) :
-Monday :
-Thuesday :
+Monday : I use my day to correct the bug for the deletion of the acacia, the acacia and the oak tree. I also upgraded the function which find the trunk of a tree from the position of one leaf block. The only tree that the function cannot delete properly is the size two jungle tree.
+Thuesday : Had difficulty to work today. I found the problems in the jungle tree deletion but I did not correct them.
+Wednesday : I have corrected all the bugs in the jungle tree deletion and continue the testing. At the end of the day, I still had a few tests to do.
+thursday : I think I'm starting to be exhaust by a lot of different things. I did not find the motivation to work or even left my bed from the day. 
+Friday : I'm still unable to work. I just need this day and after I will begin to work again. 
+
+Week Nine (01/06/2020 - 07/06/2020) :
+Monday : I begin to work on my Internship report. Also, I continue the debugging of my tree deletion function.
+Thuesday : I found a new bug in my tree deletion function which took me a lot of time to correct then I continue my work on my Internship report.
 Wednesday :
 thursday :
 Friday :
 
-updated the 25/05/2020 
+updated the 03/06/2020 
