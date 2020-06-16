@@ -50,7 +50,8 @@ def perform(level, box, options):
 	well_count = 0
 
 	# ==== PARTITIONING OF THE SELECTION IN AREA IN ORDER TO FLATTEN ====
-	earthwork_height_map = utilityFunctions.getHeightMap(level,box, None, True)
+	# Work in progress do not use
+	#earthwork_height_map = utilityFunctions.getHeightMap(level,box, None, True)
 	#area_partitioning_and_flattening(world_space, earthwork_height_map, world, biome)
 
 	# ==== PARTITIONING OF NEIGHBOURHOODS ====
@@ -118,8 +119,8 @@ def perform(level, box, options):
 		logging.info("\t{}".format(p))
 
 	for partition in final_partitioning:
-		building, apartments = generateBuilding(world, partition, height_map, usable_wood, biome)
-		inhabitants += apartments * RNG.randint(1, APARTMENT_SIZE)
+		building, apartments_inhabitants = generateBuilding(world, partition, height_map, usable_wood, biome)
+		inhabitants += apartments_inhabitants
 		all_buildings.append(building)
 
 	# ==== GENERATING NEIGHBOURHOODS ====
@@ -205,7 +206,7 @@ def perform(level, box, options):
 	logging.info("Calling MST on {} buildings".format(len(all_buildings)))
 	MST = utilityFunctions.getMST_Manhattan(all_buildings, pathMap, height_map)
 
-	pavementBlockID = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
+	pavementBlockID = BlocksInfo.getPavmentId(biome)
 	for m in MST:
 		p1 = m[1]
 		p2 = m[2]

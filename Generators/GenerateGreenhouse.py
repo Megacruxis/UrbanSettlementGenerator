@@ -30,10 +30,11 @@ def generateGreenhouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_
     utilityFunctions.cleanProperty2(matrix, greenhouse.lotArea.y_min + 1, greenhouse.lotArea.y_max, x_min - 1, x_max + 1, z_min - 1, z_max + 1)
     utilityFunctions.cleanProperty2(matrix, h_min + 1, h_max, door_x - 1, door_x + 1, greenhouse.lotArea.z_min + 1, z_min - 1)
 
-    foundation = BlocksInfo.GREENHOUSE_FUNDATION_ID[biome] if biome in BlocksInfo.GREENHOUSE_FUNDATION_ID.keys() else BlocksInfo.PLANKS_ID[utilityFunctions.selectRandomWood(usable_wood)]
-    ground = BlocksInfo.GREENHOUSE_GROUND_ID[biome] if biome in BlocksInfo.GREENHOUSE_GROUND_ID.keys() else BlocksInfo.GREENHOUSE_GROUND_ID['Base']
-    used_glass = BlocksInfo.GREENHOUSE_GLASS_ID[biome] if biome in BlocksInfo.GREENHOUSE_GLASS_ID.keys() else BlocksInfo.GREENHOUSE_GLASS_ID['Base']
-    pavement_block = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
+    picked_wood = utilityFunctions.selectRandomWood(usable_wood)
+    foundation = BlocksInfo.getGreenhouseFundationId(biome, picked_wood)
+    ground = BlocksInfo.getGreenhouseGroundId(biome)
+    used_glass = BlocksInfo.getGreenhouseGlassId(biome)
+    pavement_block = BlocksInfo.getPavmentId(biome)
 
     generateGroundAndCropse(matrix, greenhouse.buildArea.y_min,greenhouse.buildArea.x_min, greenhouse.buildArea.x_max, greenhouse.buildArea.z_min, greenhouse.buildArea.z_max, foundation, ground)
     generateGlassDome(matrix, greenhouse.buildArea.y_min + 1, greenhouse.buildArea.y_min + GREENHOUSE_HEIGHT, greenhouse.buildArea.x_min, greenhouse.buildArea.x_max, greenhouse.buildArea.z_min, greenhouse.buildArea.z_max, used_glass)

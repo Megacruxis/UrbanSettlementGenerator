@@ -24,13 +24,14 @@ def generateWell(matrix, h_min, h_max, x_min, x_max, z_min, z_max, biome) :
     logging.info("Generating well at area {}".format(well.lotArea))
     logging.info("Construction area {}".format(well.buildArea))
 
+    picked_wood = 'oak'
     fence = BlocksInfo.IRON_BAR_ID
-    slab = BlocksInfo.LOWER_SLAB_ID[biome]
-    wall = BlocksInfo.WELL_WALL_ID[biome]
-    structure_bloc = BlocksInfo.STRUCTURE_BLOCK_ID[biome]
-    pillar = BlocksInfo.HOUSE_PILLAR_ID[wall]
-    stairs = BlocksInfo.STAIRS_ID[biome][0]
-    pavement_block = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
+    slab = BlocksInfo.getSlabId(biome, picked_wood, "Lower")
+    wall = BlocksInfo.getWellWallId(biome)
+    structure_bloc = BlocksInfo.getStructureBlockId(biome, picked_wood)
+    pillar = BlocksInfo.getHousePillarId(biome, picked_wood)
+    stairs = BlocksInfo.getStairsId(biome, picked_wood)[0]
+    pavement_block = BlocksInfo.getPavmentId(biome)
 
     setGround(matrix, h_min - 1, x_min, x_max, z_min, z_max, structure_bloc)
     generateWall(matrix, h_min, x_min, x_max, z_min, z_max, wall, fence)

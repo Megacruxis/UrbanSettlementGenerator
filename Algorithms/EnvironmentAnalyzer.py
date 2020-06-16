@@ -97,20 +97,11 @@ def identifyBiome(total_ground, total_water, total_found):
         if found_blocks.has_key(BlocksInfo.GRAVEL_ID) :
             if found_blocks[BlocksInfo.GRAVEL_ID] / float(total_ground) > 0.22 :
                 return 'Mountains'
-        return 'Snowy_zone'
+        if found_plants[BlocksInfo.SNOW_ID] / float(total_ground) > 0.08 :
+            return 'Snowy_zone'
     elif found_blocks.has_key(BlocksInfo.MYCELIUM_ID) :
         if found_blocks[BlocksInfo.MYCELIUM_ID] / float(total_ground) > 0.45 :
-            return 'Mushroom Fields'
-    if total_found > 0 :
-        if float(found_wood[(162, 1)]) / total_found > 0.5:
-            return 'Dark_forest'
-        elif float(found_wood[(17, 3)]) / total_found > 0.5 :
-            return 'Jungle'
-        elif float(found_wood[(162, 0)]) / total_found > 0.3 :
-            return 'Savanna'
-        elif float(found_wood[(17, 0)] + found_wood[(17, 2)] + found_wood[(17, 1)]) / total_found > 0.6 and total_water / float(total_ground) < 0.2 :
-            logging.info("base with wood")
-            return 'Base'
+            return 'Mushroom_fields'
     if total_water / float(total_ground) > 0.7 :
         return 'Ocean'
     elif found_blocks.has_key(BlocksInfo.STONE_ID) :
@@ -119,6 +110,16 @@ def identifyBiome(total_ground, total_water, total_found):
     if found_blocks.has_key(BlocksInfo.ICE_ID) :
         if found_blocks[BlocksInfo.ICE_ID] / float(total_water) > 0.5 :
             return 'Snowy_zone'
+    if total_found > 0 :
+        if float(found_wood[(162, 1)]) / total_found > 0.5:
+            return 'Dark_forest'
+        elif float(found_wood[(17, 3)]) / total_found > 0.5 :
+            return 'Jungle'
+        elif float(found_wood[(162, 0)]) / total_found > 0.3 :
+            return 'Savanna'
+        elif float(found_wood[(17, 0)] + found_wood[(17, 2)] + found_wood[(17, 1)]) / total_found > 0.7 and not found_plants.has_key(BlocksInfo.VINES_ID) :
+            logging.info("base with wood")
+            return 'Base'
     #This part is just in order to return something
     if found_plants.has_key(BlocksInfo.VINES_ID) :
         if found_plants.has_key(BlocksInfo.LILY_PAD_ID) or found_plants.has_key(BlocksInfo.RED_MUSHROOM_ID) or found_plants.has_key(BlocksInfo.BROWN_MUSHROOM_ID):
@@ -133,6 +134,8 @@ def identifyBiome(total_ground, total_water, total_found):
         return 'Swamp'
     elif found_plants.has_key(BlocksInfo.COCOA_ID):
         return 'Jungle'
+    elif found_plants.has_key(BlocksInfo.SNOW_ID) :
+        return 'Snowy_zone'
     elif (found_plants.has_key(BlocksInfo.RED_MUSHROOM_ID) or found_plants.has_key(BlocksInfo.BROWN_MUSHROOM_ID)) and found_wood[(162, 1)] > 0 :
         return 'Dark_forest'
     return 'Base'

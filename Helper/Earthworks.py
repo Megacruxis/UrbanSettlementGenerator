@@ -65,7 +65,7 @@ def flattenPartition(matrix, x_min, x_max, z_min, z_max, height_map, biome, shif
 		 #Temporary need change
 		 underground_block = BlocksInfo.TERRACOTTA_ID
 	else :
-		underground_block = BlocksInfo.UNDERGROUND_BLOCK_ID[base_block] if base_block in BlocksInfo.UNDERGROUND_BLOCK_ID.keys() else BlocksInfo.STONE_ID
+		underground_block = BlocksInfo.getUndergroundBlockId(base_block)
 	logging.info("Most occurred ground block: {}".format(base_block))
 	logging.info("Flattening at height {}".format(average_height))
 

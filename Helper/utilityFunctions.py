@@ -724,10 +724,10 @@ def locateAndDeleteTreeFromLeaves(matrix, leaves_h, leaves_x, leaves_z) :
 	modulo = 4 if targeted_leaves[0] == 18 else 2
 	if targeted_leaves[0] in BlocksInfo.LEAVES_ID :
 		targeted_leaves = (targeted_leaves[0], targeted_leaves[1] % modulo)
-		targeted_logs = BlocksInfo.LEAVES_TO_LOGS[targeted_leaves]
+		targeted_logs = BlocksInfo.getLogIdFromLeaves(targeted_leaves)
 	elif targeted_leaves[0] in BlocksInfo.LOGS_ID :
 		targeted_logs = targeted_leaves
-		targeted_leaves = BlocksInfo.BUSH_ID[BlocksInfo.WOOD_NAME[targeted_logs]]
+		targeted_leaves = BlocksInfo.getBushId('None', BlocksInfo.getWoodName(targeted_logs))
 	tree_blocks = []
 	index = 0
 	scan_size = 10
@@ -803,10 +803,10 @@ def locateAndDeleteTreeFromLeaves(matrix, leaves_h, leaves_x, leaves_z) :
 #Delete the tree whose trunk is located in the given range of coordinates
 def deleteTree(matrix, h, x_min, x_max, z_min, z_max):
 	tree_type = getBlockAndBlockData(matrix, h, x_min, z_min)
-	targeted_leaves = BlocksInfo.BUSH_ID[BlocksInfo.WOOD_NAME[tree_type]]
+	targeted_leaves = BlocksInfo.getBushId('None', BlocksInfo.getWoodName(tree_type))
 	modulo = 4 if targeted_leaves[0] == 18 else 2
 	tree_blocks = []
-	if tree_type == BlocksInfo.WOOD_ID['acacia'] :
+	if tree_type == BlocksInfo.getWoodId('acacia') :
 		logging.info("deleting acacia tree")
 		block_to_verify = [(h, x_min, z_min)]
 		while len(block_to_verify) > 0 :
@@ -825,7 +825,7 @@ def deleteTree(matrix, h, x_min, x_max, z_min, z_max):
 				tree_blocks.append((y, x, z, targeted_leaves))
 				block_to_verify.extend(getAllBlockAround(matrix, y, y, x, z, "Cross"))
 
-	elif tree_type == BlocksInfo.WOOD_ID['dark_oak'] :
+	elif tree_type == BlocksInfo.getWoodId('dark_oak') :
 		logging.info("deleting dark oak tree")
 		scan_size = 4
 		block_to_verify = []
@@ -879,7 +879,7 @@ def deleteTree(matrix, h, x_min, x_max, z_min, z_max):
 			tree_blocks.extend(deleteLeaves(matrix, y, x, z, tree_type, tmp_scan_size, "S"))
 			tree_blocks.extend(deleteLeaves(matrix, y, x, z, tree_type, tmp_scan_size, "N"))
 
-	elif tree_type == BlocksInfo.WOOD_ID['oak'] :
+	elif tree_type == BlocksInfo.getWoodId('oak') :
 		logging.info("deleting oak tree")
 		block_to_verify = [(h, x_min, z_min)]
 		trunk_blocks = []
@@ -933,7 +933,7 @@ def deleteTree(matrix, h, x_min, x_max, z_min, z_max):
 				else :
 					clearVine(matrix, y, x, z)
 
-	elif tree_type == BlocksInfo.WOOD_ID['jungle'] and not x_min == x_max and not z_min == z_max :
+	elif tree_type == BlocksInfo.getWoodId('jungle') and not x_min == x_max and not z_min == z_max :
 		logging.info("deleting size 2 jungle tree")
 		scan_size = 5
 		block_to_verify = []
@@ -1025,7 +1025,7 @@ def deleteTree(matrix, h, x_min, x_max, z_min, z_max):
 
 	else :
 		logging.info("deleting birch or spruce or simple jungle tree with log id {}".format(tree_type))
-		scan_size = 3 if tree_type == BlocksInfo.WOOD_ID['spruce'] else 2
+		scan_size = 3 if tree_type == BlocksInfo.getWoodId('spruce') else 2
 		(h_min, h_max) = h, h
 		finish = False
 		while not finish :
@@ -1129,7 +1129,7 @@ def clearVine(matrix, h, x, z):
 	return False
 
 def deleteLeaves(matrix, trunk_h, trunk_x, trunk_z, tree_type, searching_area_size, direction):
-	targeted_leaves = BlocksInfo.BUSH_ID[BlocksInfo.WOOD_NAME[tree_type]]
+	targeted_leaves = BlocksInfo.getBushId('None', BlocksInfo.getWoodName(tree_type))
 	modulo = 4 if targeted_leaves[0] == 18 else 2
 	block_to_verify = []
 	if direction == "N" :
@@ -1182,7 +1182,7 @@ def selectRandomWood(usable_wood) :
 	for key in usable_wood.keys():
 		 current += usable_wood[key]
 		 if current >= selected :
-			 return BlocksInfo.WOOD_NAME[key]
+			 return BlocksInfo.getWoodName(key)
 	logging.info("Error in select random Wood no result obtained !")
 	return None
 

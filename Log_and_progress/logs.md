@@ -16,7 +16,7 @@ Friday : I begin my work on the improvement of the building. Spend most of my da
 
 Week four (27/04/2020 - 03/05/2020) :
 Monday : After the weekly meeting I lost the rest of the morning trying to understand why the building never had even depth or width (was due to python integer division). Understanding this allows me to start working on a new type of floor for the skyscraper : a floor with two small apartments instead of one big. At the end of the day my floor with two apartments was generated (see pictures 8 and 9) but I still had some bug on the generation of the furniture of both apartment. 
-Thuesday : I finish the programming for the generation of the furniture in the small apartment (see picture 10 and 11). I then begin my work on the spawn generation of balcony for the apartment. The first step was to design different type of balcony. Then I add the code to generate them and the code which determine when to spawn a balcony. At the end of the day I was able to generate balcony for both big or small apartment but the block use for their construction was always the same (no adaptability) (see pictures 12 and 13).
+Thuesday : I finish the programming for the generation of the furniture in the small apartment (see picture 10 and 11). I then begin my work on the generation of balcony for the apartment. The first step was to design different type of balcony. Then I add the code to generate them and the code which determine when to spawn a balcony. At the end of the day I was able to generate balcony for both big or small apartment but the block use for their construction was always the same (no adaptability) (see pictures 12 and 13).
 Wednesday : Thank to my function which determine the biome, I was able to program the adaptability for the balconies (see picture 14 and 15). I then continue my work on the design of the first floor (he gave me a lot of trouble, see picture 16) and then begin my programming of its generation. Currently, the first floor is almost generated properly (I have a problem with the flower pot) and it adapts to is environment (if we are in a desert the plant are going to be cactus instead of bush, see picture 17 and 18).
 Thursday : I Spend most of my day understanding how to put flower in flower pot and turns out the code to do it was not implemented. I ask for help on the discord, i'm still waiting for an answer. The rest of the day was spent to add the adaptability to the furniture of the apartment and work on the design of the roof (which is going to be my last building upgrade for now).
 Friday : I use my whole day to implement the generation of the roof. The roof generation currently lack of adaptability since it's always generated the same way but it is working (see picture 19 and 20).
@@ -38,7 +38,7 @@ Friday : After a quick talk with Eduardo I implemented a new way of flattening t
 Week seven (18/05/2020 - 24/05/2020) :
 Monday : I continued my work on the elimination of the trees with a new idea. Spent the whole day programming it and it's not finished. Currently, it deletes all the trees with a trunk inside a lot but it's not able to clean trees who have only some of their leaf in the plots.
 Thuesday : I finally finish a first version of a working function which clean tree properly. The process is the following : Before doing any earthwork, all the tree in the modified area are saved (in an array containing all the block of the trees). After the earthwork all the tree are place again in the area and if the area is in a lower position than before the flattening all the tree which have block outside the area are deleted (we don't place them back). When cleaning the area before building we only delete the tree with trunk inside the building area or those who have leaf inside the building area. The current version of the function is not able to delete Acacia tree and have some problem with big oak tree (those with a 2×2 blocks trunk)and dark oak tree.
-Wednesday : I begin to program the deletion of the "special" tree and clean the code of the first version. The function is now able to delete and delete properly the Acacia tree and the Jungle tree.
+Wednesday : I begin to program the deletion of the "special" tree and clean the code of the first version. The function is now able to delete properly the Acacia tree and the Jungle tree.
 Thursday : I add the case of the oak tree and the dark oak tree which mean that the function is now able to handle all type of tree. Since I still have not test all the case the function could have some bug but it should be working. I also have to redo my function which locate the trunk of a tree from one of its leave blocks. The second version of the tree deletion is almost ready (still need some test and one more special function).
 Friday : I have begun the long process of testing my tree deletion. I found some bugs that I corrected during the morning. The deletion of the oak tree is not working properly when he is adjacent to other oak tree, so I spent the rest of the day trying to solve this issue. I have come to the conclusion that the most optimal way is to delete all the adjacent trees even if it's not what I originally wanted (since I want to keep as many trees as possible in order to have some kind of "green" city). I will change my function in the upcoming days.
 
@@ -52,8 +52,15 @@ Friday : I'm still unable to work. I just need this day and after I will begin t
 Week Nine (01/06/2020 - 07/06/2020) :
 Monday : I begin to work on my Internship report. Also, I continue the debugging of my tree deletion function.
 Thuesday : I found a new bug in my tree deletion function which took me a lot of time to correct then I continue my work on my Internship report.
-Wednesday :
-thursday :
-Friday :
+Wednesday : report
+thursday : report
+Friday : report
 
-updated the 03/06/2020 
+Week Ten (08/06/2020 - 12/06/2020) :
+Monday : report
+Thuesday : report
+Wednesday : report
+thursday : report
+Friday : report
+
+updated the 11/06/2020 

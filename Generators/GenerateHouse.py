@@ -27,13 +27,13 @@ def generateHouse(matrix, h_min, h_max, x_min, x_max, z_min, z_max, biome, usabl
 	utilityFunctions.cleanProperty2(matrix, house.lotArea.y_min + 1, house.lotArea.y_max, x_min - 1, x_max + 1, z_min - 1, z_max + 1)
 
 	picked_wood = utilityFunctions.selectRandomWood(usable_wood)
-	floor = BlocksInfo.HOUSE_FLOOR_ID[biome] if biome in BlocksInfo.HOUSE_FLOOR_ID.keys() else BlocksInfo.HOUSE_FLOOR_ID[picked_wood]
-	wall = BlocksInfo.HOUSE_WALL_ID[biome][random.randint(0, len(BlocksInfo.HOUSE_WALL_ID[biome]) - 1)] if biome in BlocksInfo.HOUSE_WALL_ID.keys() else BlocksInfo.PLANKS_ID[picked_wood]
-	wall = BlocksInfo.PLANKS_ID[picked_wood] if wall[0] == -1 else wall
-	pillar = BlocksInfo.HOUSE_PILLAR_ID[wall] if wall in BlocksInfo.HOUSE_PILLAR_ID.keys() else BlocksInfo.WOOD_ID[picked_wood]
-	ceiling = BlocksInfo.STAIRS_ID[biome] if biome in BlocksInfo.STAIRS_ID.keys() else BlocksInfo.STAIRS_ID[picked_wood]
-	roof = BlocksInfo.STRUCTURE_BLOCK_ID[biome] if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else BlocksInfo.PLANKS_ID[picked_wood]
-	pavement_block = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
+	floor = BlocksInfo.getHouseFloorId(biome, picked_wood)
+	wall = BlocksInfo.getHouseWallId(biome)
+	wall = BlocksInfo.getPlankId(picked_wood) if wall[0] == -1 else wall
+	pillar = BlocksInfo.getHousePillarId(wall, picked_wood)
+	ceiling = BlocksInfo.getStairsId(biome, picked_wood)
+	roof = BlocksInfo.getStructureBlockId(biome, picked_wood)
+	pavement_block = BlocksInfo.getPavmentId(biome)
 
 	house.orientation = getOrientation(matrix, house.lotArea)
 	window_y = house.buildArea.y_min + 3
@@ -131,12 +131,6 @@ def getHouseAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max):
 
 	return (h_min, h_max, x_min, x_max, z_min, z_max)
 
-def selectHousingBlocks(picked_wood, biome):
-	if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() :
-		return BlocksInfo.UPPER_SLAB_ID[biome], BlocksInfo.STAIRS_ID[biome], BlocksInfo.FENCE_ID['iron_bar'], BlocksInfo.STRUCTURE_BLOCK_ID[biome]
-	else :
-		return BlocksInfo.UPPER_SLAB_ID[picked_wood], BlocksInfo.STAIRS_ID[picked_wood], BlocksInfo.FENCE_ID[picked_wood], BlocksInfo.PLANKS_ID[picked_wood]
-
 def generateFloor(matrix, h, x_min, x_max, z_min, z_max, floor):
 	for x in range(x_min, x_max+1):
 		for z in range(z_min, z_max+1):
@@ -172,8 +166,10 @@ def generateWalls(matrix, h_min, ceiling_bottom, x_min, x_max, z_min, z_max, wal
 				matrix.setValue(y,x_min,z, wall)
 
 def generateInterior(matrix, h_min, h_max, x_min, x_max, z_min, z_max, picked_wood, biome):
-
-	(slab_id, stairs_id, fence_id, structureBloc_id) = selectHousingBlocks(picked_wood, biome)
+	slab_id = BlocksInfo.getSlabId(biome, picked_wood, "Upper")
+	stairs_id = BlocksInfo.getStairsId(biome, picked_wood)
+	fence_id = BlocksInfo.getFenceId(biome, picked_wood)
+	structureBloc_id = BlocksInfo.getStructureBlockId(biome, picked_wood)
 
 	generateCarpet(matrix.matrix, h_min+1, x_min+1, x_max, z_min+1, z_max)
 	generateBed(matrix, h_min, x_max, z_min)

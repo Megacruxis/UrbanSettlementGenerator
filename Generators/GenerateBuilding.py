@@ -23,11 +23,15 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wo
 	logging.info("Construction area {}".format(building.constructionArea))
 	utilityFunctions.cleanProperty2(matrix, building.area.y_min + 1, building.area.y_max, x_min - 1, x_max + 1, z_min - 3 if z_min - 3 > building.area.z_min else building.area.z_min, z_max + 1)
 
+	picked_wood = utilityFunctions.selectRandomWood(usable_wood)
 	wall = (159, random.randint(0,15))
 	ceiling = wall
 	floor = wall
-	pavement_block = BlocksInfo.PAVEMENT_ID[biome] if biome in BlocksInfo.PAVEMENT_ID.keys() else BlocksInfo.PAVEMENT_ID['Base']
-	(slab, stairs, fence, structureBloc) = selectBuildingBlocks(usable_wood, biome)
+	pavement_block = BlocksInfo.getPavmentId(biome)
+	slab = BlocksInfo.getSlabId(biome, picked_wood, "Upper")
+	stairs = BlocksInfo.getStairsId(biome, picked_wood)
+	fence = BlocksInfo.getFenceId(biome, picked_wood)
+	structureBloc = BlocksInfo.getStructureBlockId(biome, picked_wood)
 
 	floor_size = 8
 	max_height = h_max-h_min
@@ -65,7 +69,8 @@ def generateBuilding(matrix, h_min, h_max, x_min, x_max, z_min, z_max, usable_wo
 		generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max-6, double_apartment_floor, usable_wood, biome, fence)
 		generateBalconySouth(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, building.area.z_min, building.orientation, double_apartment_floor, wall, slab, stairs, fence, structureBloc)
 
-	return (building, h_max / floor_size)
+		inhabitants = RNG.randint(1, 2) * (h_max / floor_size) + len(double_apartment_floor)
+	return (building, inhabitants)
 
 def getBuildingAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max):
 	building_size_x = random.randint(15, 18)
@@ -81,13 +86,6 @@ def getBuildingAreaInsideLot(h_min, h_max, x_min, x_max, z_min, z_max):
 		z_max = z_mid + building_size_z/2
 
 	return (h_min, h_max, x_min, x_max, z_min, z_max)
-
-def selectBuildingBlocks(usable_wood, biome) :
-	if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() :
-		return BlocksInfo.UPPER_SLAB_ID[biome], BlocksInfo.STAIRS_ID[biome], BlocksInfo.FENCE_ID['iron_bar'], BlocksInfo.STRUCTURE_BLOCK_ID[biome]
-	else :
-		picked_wood = utilityFunctions.selectRandomWood(usable_wood)
-		return BlocksInfo.UPPER_SLAB_ID[picked_wood], BlocksInfo.STAIRS_ID[picked_wood], BlocksInfo.FENCE_ID[picked_wood], BlocksInfo.PLANKS_ID[picked_wood]
 
 def pickDoubleapartmentFloor(h_min, h_max, floor_size):
 	floor_number = (h_max - h_min) / floor_size
@@ -158,7 +156,7 @@ def generateRoof(matrix, h_min, h_max, floor_size, x_min, x_max, z_min, z_max, b
 	for x in range(x_min, x_max + 1) :
 		for z in range(z_min, z_max + 1):
 			if x == x_min or x == x_max or z == z_max or z == z_min :
-				matrix.setValue(h_max + 1, x, z, BlocksInfo.FENCE_ID['iron_bar'])
+				matrix.setValue(h_max + 1, x, z, BlocksInfo.IRON_BAR_ID)
 	generateStreetLight(matrix, h_max, x_min + 1, z_min + 1)
 	generateStreetLight(matrix, h_max, x_max - 1, z_min + 1)
 	local_size = 5
@@ -195,9 +193,9 @@ def fillWithTable(matrix, h, x_min, x_max, z_min, z_max, stairs_id):
 				generateCentralTableSouth(matrix, h, x, z, stairs_id[0])
 
 def fillWithGarden(matrix, h, x_min, x_max, z_min, z_max, biome, usable_wood):
-	flowers_id = BlocksInfo.FLOWERS_ID[biome] if biome in BlocksInfo.FLOWERS_ID.keys() else BlocksInfo.FLOWERS_ID['Base']
-	flower_ground_id = BlocksInfo.PLANT_GROUND_ID[biome] if biome in BlocksInfo.PLANT_GROUND_ID.keys() else BlocksInfo.PLANT_GROUND_ID['Base']
-	bush_id = BlocksInfo.BUSH_ID[biome] if biome in BlocksInfo.BUSH_ID.keys() else BlocksInfo.BUSH_ID[utilityFunctions.selectRandomWood(usable_wood)]
+	flowers_id = BlocksInfo.getFlowerId(biome)
+	flower_ground_id = BlocksInfo.getPlantGroundId(biome)
+	bush_id = BlocksInfo.getBushId(biome, utilityFunctions.selectRandomWood(usable_wood))
 	for x in range(x_min, x_max + 1, 5):
 		for z in range(z_max, z_min + 1, -5):
 			if z - 5 >= z_min and x + 5 <= x_max:
@@ -258,22 +256,23 @@ def generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_
 			#hall
 			generateFurnitureHall(matrix, cur_floor, floor_size, x_min, x_mid, z_min, z_max, usable_wood, biome, fence_id)
 			#apartment on the left side of the floor
-			picked_key = biome if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else utilityFunctions.selectRandomWood(usable_wood)
-			generateFurnitureSmallApartment(matrix, cur_floor, floor_size, x_mid, x_max, z_min, z_max, 2, fence_id, picked_key)
+			picked_wood = utilityFunctions.selectRandomWood(usable_wood)
+			generateFurnitureSmallApartment(matrix, cur_floor, floor_size, x_mid, x_max, z_min, z_max, 2, fence_id, biome, picked_wood)
 		elif cur_floor in double_apartment_floor :
 			#first apartment
-			picked_key = biome if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else utilityFunctions.selectRandomWood(usable_wood)
-			generateFurnitureSmallApartment(matrix, cur_floor, floor_size, x_min, x_mid, z_min, z_max, 1, fence_id, picked_key)
+			picked_wood = utilityFunctions.selectRandomWood(usable_wood)
+			generateFurnitureSmallApartment(matrix, cur_floor, floor_size, x_min, x_mid, z_min, z_max, 1, fence_id, biome, picked_wood)
 			#second apartment
-			picked_key = biome if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else utilityFunctions.selectRandomWood(usable_wood)
-			generateFurnitureSmallApartment(matrix, cur_floor, floor_size, x_mid, x_max, z_min, z_max, 2, fence_id, picked_key)
+			picked_wood = utilityFunctions.selectRandomWood(usable_wood)
+			generateFurnitureSmallApartment(matrix, cur_floor, floor_size, x_mid, x_max, z_min, z_max, 2, fence_id, biome, picked_wood)
 		else :
-			picked_key = biome if biome in BlocksInfo.STRUCTURE_BLOCK_ID.keys() else utilityFunctions.selectRandomWood(usable_wood)
+			picked_wood = utilityFunctions.selectRandomWood(usable_wood)
+			stairs_id = BlocksInfo.getStairsId(biome, picked_wood)[0]
 			generateCarpet(matrix.matrix, cur_floor+1, x_min+1, x_max, z_min+1, z_max)
 			generateBed(matrix, cur_floor, x_max, z_min)
-			generateCentralTable(matrix, cur_floor, x_mid, z_mid, BlocksInfo.STAIRS_ID[picked_key][0])
+			generateCentralTable(matrix, cur_floor, x_mid, z_mid, stairs_id)
 			generateBookshelf(matrix, cur_floor, x_max, z_max)
-			generateCouch(matrix, cur_floor, x_min, z_max, BlocksInfo.STAIRS_ID[picked_key][0])
+			generateCouch(matrix, cur_floor, x_min, z_max, stairs_id)
 
 			x_mid = x_min + (x_max-x_min)/2
 			z_mid = z_min + (z_max-z_min)/2
@@ -282,34 +281,24 @@ def generateApartmentInterior(matrix, h_min, h_max, floor_size, x_min, x_max, z_
 
 		cur_floor += floor_size
 
-def generateFurnitureSmallApartment(matrix, h, floor_size, x_min, x_max, z_min, z_max, position, fence_id, picked_key):
+def generateFurnitureSmallApartment(matrix, h, floor_size, x_min, x_max, z_min, z_max, position, fence_id, biome, picked_wood):
 	x_mid = x_max - (x_max - x_min) / 2
 	z_mid = z_max - (z_max - z_min) / 2
 	bonus = -1 if position == 2 and (x_max - x_min % 2) == 0 else 0
 	generateCarpet(matrix.matrix, h + 1, x_min + 1, x_max, z_min + 1, z_max)
 	generateChandelier(matrix, h + floor_size, x_mid + bonus, z_mid, fence_id, 2)
-	generateCouch(matrix, h, x_min, z_max, BlocksInfo.STAIRS_ID[picked_key][0])
+	generateCouch(matrix, h, x_min, z_max, BlocksInfo.getStairsId(biome, picked_wood)[0])
 	generateBedSouth(matrix, h, x_min + 1 if position == 1 else x_max - 1, z_min + 1)
-	generateCentralTableSouth(matrix, h, x_mid + bonus, z_mid, BlocksInfo.STAIRS_ID[picked_key][0])
+	generateCentralTableSouth(matrix, h, x_mid + bonus, z_mid, BlocksInfo.getStairsId(biome, picked_wood)[0])
 	generateBookshelfEast(matrix, h, x_max, z_max)
 
 def generateFurnitureHall(matrix, h_min, floor_size, x_min, x_max, z_min, z_max, usable_wood, biome, fence_id):
 	grounds = [(47, 0), (45, 0)]
 	x_mid = x_max - (x_max - x_min) / 2
 	z_mid = z_max - (z_max - z_min) / 2
-	plant_ground_id = (3, 0)
+	plant_ground_id = BlocksInfo.getPlantGroundId(biome)
 	ground_id = grounds[random.randint(0, len(grounds) - 1)]
-
-	if biome in BlocksInfo.PLANTS_ID.keys() :
-		plant_id = BlocksInfo.PLANTS_ID[biome]
-		if plant_id[0] == BlocksInfo.CACTUS_ID :
-			if biome == 'Badlands' :
-				plant_ground_id = (12, 1)
-			else :
-				plant_ground_id = (12, 0)
-	else :
-		picked_wood = utilityFunctions.selectRandomWood(usable_wood)
-		plant_id = BlocksInfo.PLANTS_ID[picked_wood]
+	plant_id = BlocksInfo.getPlantsId(biome, utilityFunctions.selectRandomWood(usable_wood))
 	generateCarpet(matrix.matrix, h_min + 1, x_min + 1, x_max, z_min + 1, z_max + 1)
 	generateChandelier(matrix, h_min + floor_size, x_mid, z_mid, fence_id, 2)
 	generatePlant(matrix, h_min, x_min + 2, z_max - 1, plant_id, plant_ground_id)
